@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TasksRouteImport } from './routes/tasks'
+import { Route as StatsRouteImport } from './routes/stats'
 import { Route as ScheduleRouteImport } from './routes/schedule'
 import { Route as IndexRouteImport } from './routes/index'
 
 const TasksRoute = TasksRouteImport.update({
   id: '/tasks',
   path: '/tasks',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StatsRoute = StatsRouteImport.update({
+  id: '/stats',
+  path: '/stats',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ScheduleRoute = ScheduleRouteImport.update({
@@ -32,30 +38,34 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/schedule': typeof ScheduleRoute
+  '/stats': typeof StatsRoute
   '/tasks': typeof TasksRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/schedule': typeof ScheduleRoute
+  '/stats': typeof StatsRoute
   '/tasks': typeof TasksRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/schedule': typeof ScheduleRoute
+  '/stats': typeof StatsRoute
   '/tasks': typeof TasksRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/schedule' | '/tasks'
+  fullPaths: '/' | '/schedule' | '/stats' | '/tasks'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/schedule' | '/tasks'
-  id: '__root__' | '/' | '/schedule' | '/tasks'
+  to: '/' | '/schedule' | '/stats' | '/tasks'
+  id: '__root__' | '/' | '/schedule' | '/stats' | '/tasks'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ScheduleRoute: typeof ScheduleRoute
+  StatsRoute: typeof StatsRoute
   TasksRoute: typeof TasksRoute
 }
 
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/tasks'
       fullPath: '/tasks'
       preLoaderRoute: typeof TasksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stats': {
+      id: '/stats'
+      path: '/stats'
+      fullPath: '/stats'
+      preLoaderRoute: typeof StatsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/schedule': {
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ScheduleRoute: ScheduleRoute,
+  StatsRoute: StatsRoute,
   TasksRoute: TasksRoute,
 }
 export const routeTree = rootRouteImport
