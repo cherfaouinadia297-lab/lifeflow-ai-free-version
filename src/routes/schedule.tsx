@@ -239,11 +239,7 @@ function SchedulePage() {
             {cells.map((d, i) => {
               if (!d) return <div key={i} />;
               const iso = toISO(d);
-              const dayTasks = useMemo(
-                () => state.tasks.filter((t) => t.date === iso),
-                // eslint-disable-next-line react-hooks/exhaustive-deps
-                [state.tasks, iso],
-              );
+              const dayTasks = state.tasks.filter((t) => t.date === iso);
               const isToday = iso === todayIso;
               return (
                 <button
