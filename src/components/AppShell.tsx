@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { CalendarDays, ListChecks, BarChart3, Settings, Home, Sparkles } from "lucide-react";
+import { CalendarDays, ListChecks, BarChart3, Settings, Home, Sparkles, Bot, Timer as TimerIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { useStore } from "@/lib/store";
 
@@ -7,6 +7,8 @@ const NAV = [
   { to: "/", label: "اليوم", icon: Home },
   { to: "/schedule", label: "الجدول", icon: CalendarDays },
   { to: "/tasks", label: "المهام", icon: ListChecks },
+  { to: "/assistant", label: "المساعد", icon: Bot },
+  { to: "/timer", label: "الموقت", icon: TimerIcon },
   { to: "/stats", label: "الإحصائيات", icon: BarChart3 },
   { to: "/settings", label: "الإعدادات", icon: Settings },
 ] as const;

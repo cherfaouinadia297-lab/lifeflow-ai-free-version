@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { AppState, Task, UserProgress } from "./types";
+import { getLangMeta } from "./i18n";
 
 const STORAGE_KEY = "lifeflow-state-v1";
 
@@ -16,6 +17,8 @@ const initialState: AppState = {
   progress: initialProgress,
   language: "ar",
   theme: "light",
+  ringtone: "classic",
+  volume: 0.6,
 };
 
 function loadState(): AppState {
@@ -79,8 +82,10 @@ interface StoreContext {
   updateTask: (id: string, patch: Partial<Task>) => void;
   deleteTask: (id: string) => void;
   toggleComplete: (id: string) => void;
-  setLanguage: (lang: "ar" | "en") => void;
+  setLanguage: (lang: string) => void;
   setTheme: (t: "light" | "dark" | "system") => void;
+  setRingtone: (id: string) => void;
+  setVolume: (v: number) => void;
   resetAll: () => void;
 }
 
@@ -120,8 +125,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   // Apply language / direction
   useEffect(() => {
     if (!hydrated) return;
-    document.documentElement.lang = state.language;
-    document.documentElement.dir = state.language === "ar" ? "rtl" : "ltr";
+    const meta = getLangMeta(state.language);
+    document.documentElement.lang = meta.code;
+    document.documentElement.dir = meta.dir;
   }, [state.language, hydrated]);
 
   const api = useMemo<StoreContext>(
@@ -191,6 +197,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       },
       setLanguage: (lang) => setState((s) => ({ ...s, language: lang })),
       setTheme: (theme) => setState((s) => ({ ...s, theme })),
+      setRingtone: (id) => setState((s) => ({ ...s, ringtone: id })),
+      setVolume: (v) => setState((s) => ({ ...s, volume: Math.max(0, Math.min(1, v)) })),
       resetAll: () => setState(initialState),
     }),
     [state],

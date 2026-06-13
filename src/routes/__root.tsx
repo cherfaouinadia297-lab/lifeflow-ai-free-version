@@ -13,7 +13,8 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { StoreProvider, useStore } from "../lib/store";
 import { Toaster } from "../components/ui/sonner";
-import { dueTasks, notify } from "../lib/notifications";
+import { dueTasks, notifyWithSound } from "../lib/notifications";
+import type { RingtoneId } from "../lib/sound";
 
 function NotFoundComponent() {
   return (
@@ -145,11 +146,16 @@ function NotificationScheduler() {
     const id = window.setInterval(() => {
       const due = dueTasks(state.tasks);
       for (const t of due) {
-        notify(t.title, `حان موعد النشاط (${t.startTime})`);
+        notifyWithSound(
+          t.title,
+          `حان موعد النشاط (${t.startTime})`,
+          state.ringtone as RingtoneId,
+          state.volume,
+        );
         updateTask(t.id, { notified: true });
       }
     }, 30_000);
     return () => window.clearInterval(id);
-  }, [state.tasks, updateTask]);
+  }, [state.tasks, state.ringtone, state.volume, updateTask]);
   return null;
 }
