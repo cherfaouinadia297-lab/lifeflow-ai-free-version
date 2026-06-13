@@ -37,6 +37,8 @@ export interface UserProgress {
 export interface AppState {
   tasks: Task[];
   progress: UserProgress;
-  language: "ar" | "en";
+  language: string;
   theme: "light" | "dark" | "system";
+  ringtone: string;
+  volume: number;
 }

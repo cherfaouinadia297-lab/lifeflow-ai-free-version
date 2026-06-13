@@ -1,4 +1,5 @@
 import type { Task } from "./types";
+import { playRingtone, type RingtoneId } from "./sound";
 
 export async function ensureNotificationPermission(): Promise<NotificationPermission> {
   if (typeof window === "undefined" || !("Notification" in window)) return "denied";
@@ -20,6 +21,16 @@ export function notify(title: string, body: string) {
   } catch {
     /* noop */
   }
+}
+
+export function notifyWithSound(
+  title: string,
+  body: string,
+  ringtone: RingtoneId = "classic",
+  volume = 0.5,
+) {
+  notify(title, body);
+  playRingtone(ringtone, volume);
 }
 
 /** Returns tasks whose start time is within the next 60 seconds and not yet notified. */
