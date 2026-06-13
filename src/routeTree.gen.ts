@@ -9,22 +9,22 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as TimerRouteImport } from './routes/timer'
+import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as StatsRouteImport } from './routes/stats'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ScheduleRouteImport } from './routes/schedule'
 import { Route as AssistantRouteImport } from './routes/assistant'
 import { Route as IndexRouteImport } from './routes/index'
 
-const TasksRoute = TasksRouteImport.update({
-  id: '/tasks',
-  path: '/tasks',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const TimerRoute = TimerRouteImport.update({
   id: '/timer',
   path: '/timer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TasksRoute = TasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StatsRoute = StatsRouteImport.update({
@@ -59,8 +59,8 @@ export interface FileRoutesByFullPath {
   '/schedule': typeof ScheduleRoute
   '/settings': typeof SettingsRoute
   '/stats': typeof StatsRoute
-  '/timer': typeof TimerRoute
   '/tasks': typeof TasksRoute
+  '/timer': typeof TimerRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -68,8 +68,8 @@ export interface FileRoutesByTo {
   '/schedule': typeof ScheduleRoute
   '/settings': typeof SettingsRoute
   '/stats': typeof StatsRoute
-  '/timer': typeof TimerRoute
   '/tasks': typeof TasksRoute
+  '/timer': typeof TimerRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -78,15 +78,37 @@ export interface FileRoutesById {
   '/schedule': typeof ScheduleRoute
   '/settings': typeof SettingsRoute
   '/stats': typeof StatsRoute
-  '/timer': typeof TimerRoute
   '/tasks': typeof TasksRoute
+  '/timer': typeof TimerRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/assistant' | '/schedule' | '/settings' | '/stats' | '/timer' | '/tasks'
+  fullPaths:
+    | '/'
+    | '/assistant'
+    | '/schedule'
+    | '/settings'
+    | '/stats'
+    | '/tasks'
+    | '/timer'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/assistant' | '/schedule' | '/settings' | '/stats' | '/timer' | '/tasks'
-  id: '__root__' | '/' | '/assistant' | '/schedule' | '/settings' | '/stats' | '/timer' | '/tasks'
+  to:
+    | '/'
+    | '/assistant'
+    | '/schedule'
+    | '/settings'
+    | '/stats'
+    | '/tasks'
+    | '/timer'
+  id:
+    | '__root__'
+    | '/'
+    | '/assistant'
+    | '/schedule'
+    | '/settings'
+    | '/stats'
+    | '/tasks'
+    | '/timer'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -95,24 +117,24 @@ export interface RootRouteChildren {
   ScheduleRoute: typeof ScheduleRoute
   SettingsRoute: typeof SettingsRoute
   StatsRoute: typeof StatsRoute
-  TimerRoute: typeof TimerRoute
   TasksRoute: typeof TasksRoute
+  TimerRoute: typeof TimerRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/tasks': {
-      id: '/tasks'
-      path: '/tasks'
-      fullPath: '/tasks'
-      preLoaderRoute: typeof TasksRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/timer': {
       id: '/timer'
       path: '/timer'
       fullPath: '/timer'
       preLoaderRoute: typeof TimerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tasks': {
+      id: '/tasks'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof TasksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/stats': {
@@ -159,8 +181,8 @@ const rootRouteChildren: RootRouteChildren = {
   ScheduleRoute: ScheduleRoute,
   SettingsRoute: SettingsRoute,
   StatsRoute: StatsRoute,
-  TimerRoute: TimerRoute,
   TasksRoute: TasksRoute,
+  TimerRoute: TimerRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
