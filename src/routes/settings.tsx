@@ -3,8 +3,11 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 import { ensureNotificationPermission } from "@/lib/notifications";
-import { Moon, Sun, Bell, Languages, Trash2, Monitor } from "lucide-react";
+import { Moon, Sun, Bell, Languages, Trash2, Monitor, Music2, Volume2 } from "lucide-react";
 import { toast } from "sonner";
+import { LANGUAGES } from "@/lib/i18n";
+import { RINGTONES, playRingtone, type RingtoneId } from "@/lib/sound";
+import { Slider } from "@/components/ui/slider";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -17,7 +20,7 @@ export const Route = createFileRoute("/settings")({
 });
 
 function SettingsPage() {
-  const { state, setLanguage, setTheme, resetAll } = useStore();
+  const { state, setLanguage, setTheme, setRingtone, setVolume, resetAll } = useStore();
 
   return (
     <AppShell>
@@ -28,9 +31,16 @@ function SettingsPage() {
         </div>
 
         <Section icon={<Languages className="h-4 w-4" />} title="اللغة">
-          <div className="flex gap-2">
-            <Choice active={state.language === "ar"} onClick={() => setLanguage("ar")}>العربية</Choice>
-            <Choice active={state.language === "en"} onClick={() => setLanguage("en")}>English</Choice>
+          <div className="flex flex-wrap gap-2">
+            {LANGUAGES.map((l) => (
+              <Choice
+                key={l.code}
+                active={state.language === l.code}
+                onClick={() => setLanguage(l.code)}
+              >
+                {l.label}
+              </Choice>
+            ))}
           </div>
         </Section>
 
@@ -62,6 +72,43 @@ function SettingsPage() {
           >
             <Bell className="me-1 h-4 w-4" />
             تفعيل الإشعارات
+          </Button>
+        </Section>
+
+        <Section icon={<Music2 className="h-4 w-4" />} title="نغمة التنبيه">
+          <div className="flex flex-wrap gap-2">
+            {RINGTONES.map((r) => (
+              <Choice
+                key={r.id}
+                active={state.ringtone === r.id}
+                onClick={() => {
+                  setRingtone(r.id);
+                  playRingtone(r.id, state.volume);
+                }}
+              >
+                {r.label}
+              </Choice>
+            ))}
+          </div>
+          <div className="mt-4 flex items-center gap-3">
+            <Volume2 className="h-4 w-4 text-muted-foreground" />
+            <Slider
+              value={[Math.round(state.volume * 100)]}
+              onValueChange={(v) => setVolume((v[0] ?? 50) / 100)}
+              max={100}
+              step={5}
+              className="flex-1"
+            />
+            <span className="w-10 text-end text-xs text-muted-foreground">
+              {Math.round(state.volume * 100)}%
+            </span>
+          </div>
+          <Button
+            variant="outline"
+            className="mt-3"
+            onClick={() => playRingtone(state.ringtone as RingtoneId, state.volume)}
+          >
+            تجربة النغمة
           </Button>
         </Section>
 
