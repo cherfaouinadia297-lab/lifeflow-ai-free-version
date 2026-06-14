@@ -9,6 +9,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useStore } from "@/lib/store";
 import { getCategory } from "@/lib/categories";
 import type { Task } from "@/lib/types";
+import { toLocalISO } from "@/lib/local-date";
 
 export const Route = createFileRoute("/schedule")({
   head: () => ({
@@ -22,9 +23,7 @@ export const Route = createFileRoute("/schedule")({
 
 type View = "day" | "week" | "month";
 
-function toISO(d: Date): string {
-  return d.toISOString().slice(0, 10);
-}
+const toISO = toLocalISO;
 
 function SchedulePage() {
   const { state } = useStore();

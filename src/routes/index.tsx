@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { useStore, XP_PER_LEVEL } from "@/lib/store";
 import { ensureNotificationPermission } from "@/lib/notifications";
 import type { Task } from "@/lib/types";
+import { todayLocal } from "@/lib/local-date";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -25,7 +26,7 @@ function TodayPage() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Task | null>(null);
 
-  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayStr = todayLocal();
   const todayTasks = useMemo(
     () =>
       state.tasks

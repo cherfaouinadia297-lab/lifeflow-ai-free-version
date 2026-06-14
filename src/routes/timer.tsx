@@ -1,12 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Play, Pause, RotateCcw, Timer as TimerIcon } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
-import { playRingtone, RINGTONES, type RingtoneId } from "@/lib/sound";
+import { RINGTONES } from "@/lib/sound";
 import { t } from "@/lib/i18n";
-import { toast } from "sonner";
 
 export const Route = createFileRoute("/timer")({
   head: () => ({
@@ -21,40 +20,33 @@ export const Route = createFileRoute("/timer")({
 const PRESETS = [5, 10, 15, 25, 30, 45, 60];
 
 function TimerPage() {
-  const { state } = useStore();
+  const { state, startTimer, pauseTimer, resumeTimer, resetTimer } = useStore();
   const lang = state.language;
-  const [minutes, setMinutes] = useState(25);
-  const [remaining, setRemaining] = useState(25 * 60);
-  const [running, setRunning] = useState(false);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timer = state.timer;
+  const minutes = Math.max(1, Math.round(timer.totalSec / 60));
 
+  // Re-render every second so the countdown updates while a timer is running.
+  const [, setNow] = useState(Date.now());
   useEffect(() => {
-    if (!running) return;
-    intervalRef.current = setInterval(() => {
-      setRemaining((r) => {
-        if (r <= 1) {
-          setRunning(false);
-          playRingtone(state.ringtone as RingtoneId, state.volume);
-          toast.success(t(lang, "timerDone"));
-          return 0;
-        }
-        return r - 1;
-      });
-    }, 1000);
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [running, state.ringtone, state.volume, lang]);
+    if (!timer.endsAt) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [timer.endsAt]);
 
-  const set = (m: number) => {
-    setRunning(false);
-    setMinutes(m);
-    setRemaining(m * 60);
-  };
+  let remaining = timer.totalSec;
+  if (timer.endsAt) {
+    remaining = Math.max(0, Math.round((timer.endsAt - Date.now()) / 1000));
+  } else if (timer.pausedRemaining != null) {
+    remaining = timer.pausedRemaining;
+  }
+  const running = !!timer.endsAt;
+  const paused = timer.pausedRemaining != null;
+
+  const set = (m: number) => resetTimer(m);
 
   const mm = Math.floor(remaining / 60).toString().padStart(2, "0");
   const ss = (remaining % 60).toString().padStart(2, "0");
-  const total = minutes * 60;
+  const total = timer.totalSec;
   const pct = total ? ((total - remaining) / total) * 100 : 0;
 
   return (
@@ -97,17 +89,21 @@ function TimerPage() {
 
           <div className="mt-6 flex gap-2">
             {!running ? (
-              <Button onClick={() => setRunning(true)} className="bg-gradient-primary" size="lg">
+              <Button
+                onClick={() => (paused ? resumeTimer() : startTimer(minutes))}
+                className="bg-gradient-primary"
+                size="lg"
+              >
                 <Play className="me-1 h-4 w-4" />
-                {remaining < minutes * 60 && remaining > 0 ? t(lang, "resume") : t(lang, "start")}
+                {paused ? t(lang, "resume") : t(lang, "start")}
               </Button>
             ) : (
-              <Button onClick={() => setRunning(false)} variant="outline" size="lg">
+              <Button onClick={() => pauseTimer()} variant="outline" size="lg">
                 <Pause className="me-1 h-4 w-4" />
                 {t(lang, "pause")}
               </Button>
             )}
-            <Button onClick={() => set(minutes)} variant="ghost" size="lg">
+            <Button onClick={() => resetTimer(minutes)} variant="ghost" size="lg">
               <RotateCcw className="me-1 h-4 w-4" />
               {t(lang, "reset")}
             </Button>
