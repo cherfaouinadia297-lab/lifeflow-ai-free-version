@@ -1,6 +1,19 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import type { AppState, Task, UserProgress } from "./types";
+import type {
+  AppState,
+  Task,
+  UserProgress,
+  TimerState,
+  PrayerState,
+  WeatherState,
+  RingingState,
+  PrayerCoords,
+  PrayerTimings,
+  WeatherCoords,
+  WeatherCache,
+} from "./types";
 import { getLangMeta } from "./i18n";
+import { todayLocal, yesterdayLocal } from "./local-date";
 
 const STORAGE_KEY = "lifeflow-state-v1";
 
@@ -12,6 +25,18 @@ const initialProgress: UserProgress = {
   unlockedBadges: [],
 };
 
+const initialTimer: TimerState = { endsAt: null, totalSec: 25 * 60, pausedRemaining: null };
+
+const initialPrayer: PrayerState = {
+  coords: null,
+  method: 2,
+  enabled: { Fajr: true, Dhuhr: true, Asr: true, Maghrib: true, Isha: true },
+  reminderMinutes: 0,
+  cache: null,
+};
+
+const initialWeather: WeatherState = { coords: null, cache: null };
+
 const initialState: AppState = {
   tasks: [],
   progress: initialProgress,
@@ -19,6 +44,10 @@ const initialState: AppState = {
   theme: "light",
   ringtone: "classic",
   volume: 0.6,
+  timer: initialTimer,
+  prayer: initialPrayer,
+  weather: initialWeather,
+  ringing: null,
 };
 
 function loadState(): AppState {
@@ -32,6 +61,10 @@ function loadState(): AppState {
       ...parsed,
       progress: { ...initialProgress, ...(parsed.progress ?? {}) },
       tasks: parsed.tasks ?? [],
+      timer: { ...initialTimer, ...(parsed.timer ?? {}) },
+      prayer: { ...initialPrayer, ...(parsed.prayer ?? {}) },
+      weather: { ...initialWeather, ...(parsed.weather ?? {}) },
+      ringing: null, // never restore a ringing alarm across reloads
     };
   } catch {
     return initialState;
@@ -49,10 +82,25 @@ const BADGES = [
   { id: "first-task", xp: 15 },
   { id: "streak-3", streak: 3 },
   { id: "streak-7", streak: 7 },
+  { id: "streak-14", streak: 14 },
+  { id: "streak-30", streak: 30 },
+  { id: "streak-60", streak: 60 },
+  { id: "streak-100", streak: 100 },
   { id: "level-1", level: 1 },
+  { id: "level-3", level: 3 },
   { id: "level-5", level: 5 },
+  { id: "level-10", level: 10 },
+  { id: "level-20", level: 20 },
+  { id: "level-50", level: 50 },
+  { id: "tasks-10", tasks: 10 },
   { id: "tasks-25", tasks: 25 },
+  { id: "tasks-50", tasks: 50 },
   { id: "tasks-100", tasks: 100 },
+  { id: "tasks-250", tasks: 250 },
+  { id: "tasks-500", tasks: 500 },
+  { id: "xp-500", xp: 500 },
+  { id: "xp-1000", xp: 1000 },
+  { id: "xp-5000", xp: 5000 },
 ];
 
 function evaluateBadges(progress: UserProgress, completedCount: number): string[] {
@@ -66,16 +114,6 @@ function evaluateBadges(progress: UserProgress, completedCount: number): string[
   return Array.from(unlocked);
 }
 
-function todayStr(): string {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function yesterdayStr(): string {
-  const d = new Date();
-  d.setDate(d.getDate() - 1);
-  return d.toISOString().slice(0, 10);
-}
-
 interface StoreContext {
   state: AppState;
   addTask: (task: Omit<Task, "id" | "createdAt" | "completed">) => void;
@@ -87,6 +125,23 @@ interface StoreContext {
   setRingtone: (id: string) => void;
   setVolume: (v: number) => void;
   resetAll: () => void;
+  // Timer
+  startTimer: (minutes: number) => void;
+  pauseTimer: () => void;
+  resumeTimer: () => void;
+  resetTimer: (minutes?: number) => void;
+  finishTimer: () => void;
+  // Ringing alarm dialog
+  setRinging: (r: RingingState | null) => void;
+  // Prayer
+  setPrayerCoords: (c: PrayerCoords | null) => void;
+  setPrayerMethod: (m: number) => void;
+  setPrayerEnabled: (key: string, enabled: boolean) => void;
+  setPrayerReminder: (mins: number) => void;
+  setPrayerCache: (c: PrayerTimings | null) => void;
+  // Weather
+  setWeatherCoords: (c: WeatherCoords | null) => void;
+  setWeatherCache: (c: WeatherCache | null) => void;
 }
 
 const Ctx = createContext<StoreContext | null>(null);
@@ -173,11 +228,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           let progress = s.progress;
           if (willComplete) {
             const newXp = progress.xp + XP_PER_TASK;
-            const today = todayStr();
+            const today = todayLocal();
             let streak = progress.streak;
             if (progress.lastActiveDate === today) {
               // same day, keep streak
-            } else if (progress.lastActiveDate === yesterdayStr()) {
+            } else if (progress.lastActiveDate === yesterdayLocal()) {
               streak += 1;
             } else {
               streak = 1;
@@ -191,6 +246,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             };
             const completedCount = newTasks.filter((t) => t.completed).length;
             progress = { ...progress, unlockedBadges: evaluateBadges(progress, completedCount) };
+          } else {
+            // Un-completing: refund the XP and recompute level. Keep badges already earned.
+            const newXp = Math.max(0, progress.xp - XP_PER_TASK);
+            progress = {
+              ...progress,
+              xp: newXp,
+              level: computeLevel(newXp),
+            };
           }
           return { ...s, tasks: newTasks, progress };
         });
@@ -200,6 +263,60 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setRingtone: (id) => setState((s) => ({ ...s, ringtone: id })),
       setVolume: (v) => setState((s) => ({ ...s, volume: Math.max(0, Math.min(1, v)) })),
       resetAll: () => setState(initialState),
+      // Timer ---------------------------------------------------------
+      startTimer: (minutes) =>
+        setState((s) => ({
+          ...s,
+          timer: {
+            endsAt: Date.now() + minutes * 60 * 1000,
+            totalSec: minutes * 60,
+            pausedRemaining: null,
+          },
+        })),
+      pauseTimer: () =>
+        setState((s) => {
+          if (!s.timer.endsAt) return s;
+          const remaining = Math.max(0, Math.round((s.timer.endsAt - Date.now()) / 1000));
+          return { ...s, timer: { ...s.timer, endsAt: null, pausedRemaining: remaining } };
+        }),
+      resumeTimer: () =>
+        setState((s) => {
+          if (s.timer.pausedRemaining == null) return s;
+          return {
+            ...s,
+            timer: {
+              ...s.timer,
+              endsAt: Date.now() + s.timer.pausedRemaining * 1000,
+              pausedRemaining: null,
+            },
+          };
+        }),
+      resetTimer: (minutes) =>
+        setState((s) => ({
+          ...s,
+          timer: {
+            endsAt: null,
+            totalSec: (minutes ?? s.timer.totalSec / 60) * 60 || s.timer.totalSec,
+            pausedRemaining: null,
+          },
+        })),
+      finishTimer: () =>
+        setState((s) => ({ ...s, timer: { ...s.timer, endsAt: null, pausedRemaining: null } })),
+      setRinging: (r) => setState((s) => ({ ...s, ringing: r })),
+      // Prayer --------------------------------------------------------
+      setPrayerCoords: (c) => setState((s) => ({ ...s, prayer: { ...s.prayer, coords: c } })),
+      setPrayerMethod: (m) => setState((s) => ({ ...s, prayer: { ...s.prayer, method: m } })),
+      setPrayerEnabled: (key, enabled) =>
+        setState((s) => ({
+          ...s,
+          prayer: { ...s.prayer, enabled: { ...s.prayer.enabled, [key]: enabled } },
+        })),
+      setPrayerReminder: (mins) =>
+        setState((s) => ({ ...s, prayer: { ...s.prayer, reminderMinutes: mins } })),
+      setPrayerCache: (c) => setState((s) => ({ ...s, prayer: { ...s.prayer, cache: c } })),
+      // Weather -------------------------------------------------------
+      setWeatherCoords: (c) => setState((s) => ({ ...s, weather: { ...s.weather, coords: c } })),
+      setWeatherCache: (c) => setState((s) => ({ ...s, weather: { ...s.weather, cache: c } })),
     }),
     [state],
   );
