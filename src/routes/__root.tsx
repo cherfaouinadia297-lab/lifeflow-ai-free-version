@@ -13,8 +13,13 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { StoreProvider, useStore } from "../lib/store";
 import { Toaster } from "../components/ui/sonner";
-import { dueTasks, notifyWithSound } from "../lib/notifications";
+import { notify, scheduleTaskAlarms } from "../lib/notifications";
 import type { RingtoneId } from "../lib/sound";
+import { startAlarm, stopAlarm } from "../lib/sound";
+import { registerNotificationSW } from "../lib/sw-register";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog";
+import { Button } from "../components/ui/button";
+import { BellRing } from "lucide-react";
 
 function NotFoundComponent() {
   return (
@@ -132,6 +137,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <StoreProvider>
         <NotificationScheduler />
+        <AlarmDialog />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         <Toaster position="top-center" richColors />
@@ -141,21 +147,77 @@ function RootComponent() {
 }
 
 function NotificationScheduler() {
-  const { state, updateTask } = useStore();
+  const { state, updateTask, setRinging, finishTimer } = useStore();
+
+  // Register the service worker once
   useEffect(() => {
-    const id = window.setInterval(() => {
-      const due = dueTasks(state.tasks);
-      for (const t of due) {
-        notifyWithSound(
-          t.title,
-          `حان موعد النشاط (${t.startTime})`,
-          state.ringtone as RingtoneId,
-          state.volume,
-        );
-        updateTask(t.id, { notified: true });
+    void registerNotificationSW();
+  }, []);
+
+  // Precise per-task alarm scheduling (re-runs whenever tasks change)
+  useEffect(() => {
+    const cleanup = scheduleTaskAlarms(state.tasks, (t) => {
+      const body = `حان موعد النشاط (${t.startTime})`;
+      notify(t.title, body);
+      startAlarm(state.ringtone as RingtoneId, state.volume);
+      setRinging({ title: t.title, body, startedAt: Date.now() });
+      updateTask(t.id, { notified: true });
+    });
+    return cleanup;
+  }, [state.tasks, state.ringtone, state.volume, updateTask, setRinging]);
+
+  // Background-persistent timer: check every second whether endsAt elapsed
+  useEffect(() => {
+    const endsAt = state.timer.endsAt;
+    if (!endsAt) return;
+    const tick = () => {
+      if (Date.now() >= endsAt) {
+        notify("انتهى الموقت", "حان وقت العودة!");
+        startAlarm(state.ringtone as RingtoneId, state.volume);
+        setRinging({ title: "انتهى الموقت", body: "حان وقت العودة!", startedAt: Date.now() });
+        finishTimer();
       }
-    }, 30_000);
+    };
+    const id = window.setInterval(tick, 1000);
     return () => window.clearInterval(id);
-  }, [state.tasks, state.ringtone, state.volume, updateTask]);
+  }, [state.timer.endsAt, state.ringtone, state.volume, finishTimer, setRinging]);
+
   return null;
+}
+
+function AlarmDialog() {
+  const { state, setRinging } = useStore();
+  const ringing = state.ringing;
+  const open = !!ringing;
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        if (!v) {
+          stopAlarm();
+          setRinging(null);
+        }
+      }}
+    >
+      <DialogContent className="max-w-sm text-center">
+        <DialogHeader>
+          <DialogTitle className="font-display flex items-center justify-center gap-2 text-xl">
+            <BellRing className="h-5 w-5 animate-pulse text-primary" />
+            {ringing?.title ?? ""}
+          </DialogTitle>
+        </DialogHeader>
+        <p className="text-sm text-muted-foreground">{ringing?.body ?? ""}</p>
+        <Button
+          className="mt-3 bg-gradient-primary"
+          size="lg"
+          onClick={() => {
+            stopAlarm();
+            setRinging(null);
+          }}
+        >
+          إيقاف التنبيه
+        </Button>
+      </DialogContent>
+    </Dialog>
+  );
 }

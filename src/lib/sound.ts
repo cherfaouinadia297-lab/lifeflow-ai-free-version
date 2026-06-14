@@ -70,3 +70,28 @@ export function playRingtone(id: RingtoneId = "classic", volume = 0.5) {
       break;
   }
 }
+
+/**
+ * Long-running looping alarm — keeps playing the ringtone every ~3s until
+ * stopAlarm() is called (or until the safety cap of 10 minutes).
+ */
+let alarmInterval: ReturnType<typeof setInterval> | null = null;
+let alarmSafetyTimeout: ReturnType<typeof setTimeout> | null = null;
+
+export function startAlarm(id: RingtoneId = "classic", volume = 0.6) {
+  stopAlarm();
+  playRingtone(id, volume);
+  alarmInterval = setInterval(() => playRingtone(id, volume), 3000);
+  alarmSafetyTimeout = setTimeout(() => stopAlarm(), 10 * 60 * 1000);
+}
+
+export function stopAlarm() {
+  if (alarmInterval) clearInterval(alarmInterval);
+  if (alarmSafetyTimeout) clearTimeout(alarmSafetyTimeout);
+  alarmInterval = null;
+  alarmSafetyTimeout = null;
+}
+
+export function isAlarmActive(): boolean {
+  return alarmInterval !== null;
+}
