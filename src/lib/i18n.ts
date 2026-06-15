@@ -191,6 +191,29 @@ const STRINGS: Record<string, Dict> = {
 
 export type StringKey = keyof (typeof STRINGS)["ar"];
 
+// Ensure every language has at least the nav keys (fallback chain ar→en otherwise).
+const NAV_FILL: Record<string, Record<string, string>> = {
+  de: { today: "Heute", schedule: "Plan", tasks: "Aufgaben", assistant: "Assistent", timer: "Timer", stats: "Statistik", settings: "Einstellungen", prayer: "Gebet", weather: "Wetter" },
+  it: { today: "Oggi", schedule: "Agenda", tasks: "Attività", assistant: "Assistente", timer: "Timer", stats: "Statistiche", settings: "Impostazioni", prayer: "Preghiera", weather: "Meteo" },
+  pt: { today: "Hoje", schedule: "Agenda", tasks: "Tarefas", assistant: "Assistente", timer: "Cronômetro", stats: "Estatísticas", settings: "Ajustes", prayer: "Oração", weather: "Clima" },
+  ru: { today: "Сегодня", schedule: "Расписание", tasks: "Задачи", assistant: "Ассистент", timer: "Таймер", stats: "Статистика", settings: "Настройки", prayer: "Молитва", weather: "Погода" },
+  zh: { today: "今天", schedule: "日程", tasks: "任务", assistant: "助手", timer: "计时器", stats: "统计", settings: "设置", prayer: "祈祷", weather: "天气" },
+  ja: { today: "今日", schedule: "予定", tasks: "タスク", assistant: "アシスタント", timer: "タイマー", stats: "統計", settings: "設定", prayer: "礼拝", weather: "天気" },
+  ko: { today: "오늘", schedule: "일정", tasks: "할 일", assistant: "도우미", timer: "타이머", stats: "통계", settings: "설정", prayer: "기도", weather: "날씨" },
+  hi: { today: "आज", schedule: "अनुसूची", tasks: "कार्य", assistant: "सहायक", timer: "टाइमर", stats: "आँकड़े", settings: "सेटिंग्स", prayer: "प्रार्थना", weather: "मौसम" },
+  id: { today: "Hari ini", schedule: "Jadwal", tasks: "Tugas", assistant: "Asisten", timer: "Pengatur waktu", stats: "Statistik", settings: "Pengaturan", prayer: "Salat", weather: "Cuaca" },
+  he: { today: "היום", schedule: "לוח", tasks: "משימות", assistant: "עוזר", timer: "טיימר", stats: "סטטיסטיקה", settings: "הגדרות", prayer: "תפילה", weather: "מזג אוויר" },
+  fr: { prayer: "Prière", weather: "Météo" },
+  es: { prayer: "Oración", weather: "Clima" },
+  tr: { prayer: "Namaz", weather: "Hava" },
+  ur: { prayer: "نماز", weather: "موسم" },
+  fa: { prayer: "نماز", weather: "هوا" },
+};
+
+for (const [lang, fill] of Object.entries(NAV_FILL)) {
+  STRINGS[lang] = { ...(STRINGS[lang] ?? {}), ...fill };
+}
+
 export function t(lang: string, key: StringKey): string {
   return STRINGS[lang]?.[key] ?? STRINGS.en[key] ?? STRINGS.ar[key] ?? String(key);
 }
