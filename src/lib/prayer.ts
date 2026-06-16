@@ -19,8 +19,10 @@ export async function fetchPrayerTimes(
 ): Promise<PrayerTimings> {
   const d = date;
   const path = `${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}-${d.getFullYear()}`;
-  const url = `https://api.aladhan.com/v1/timings/${path}?latitude=${lat}&longitude=${lng}&method=${method}`;
-  const res = await fetch(url);
+  // School=0 (Shafi/standard) is the default. iso8601=false returns local HH:mm in the
+  // location's own timezone, which is what we display. Cache-bust with a daily token.
+  const url = `https://api.aladhan.com/v1/timings/${path}?latitude=${lat}&longitude=${lng}&method=${method}&school=0&iso8601=false`;
+  const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error("prayer_fetch_failed");
   const json = (await res.json()) as AlAdhanResponse;
   const t = json.data.timings;
