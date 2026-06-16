@@ -20,6 +20,7 @@ import { registerNotificationSW } from "../lib/sw-register";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog";
 import { Button } from "../components/ui/button";
 import { BellRing } from "lucide-react";
+import { t } from "../lib/i18n";
 
 function NotFoundComponent() {
   return (
@@ -189,6 +190,7 @@ function AlarmDialog() {
   const { state, setRinging } = useStore();
   const ringing = state.ringing;
   const open = !!ringing;
+  const lang = state.language;
   return (
     <Dialog
       open={open}
@@ -215,7 +217,7 @@ function AlarmDialog() {
             setRinging(null);
           }}
         >
-          إيقاف التنبيه
+          {t(lang, "stopAlarm")}
         </Button>
       </DialogContent>
     </Dialog>
