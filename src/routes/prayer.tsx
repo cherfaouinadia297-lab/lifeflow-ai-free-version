@@ -176,7 +176,7 @@ function PrayerPage() {
           <Card className="space-y-4 p-5">
             <div className="flex items-center gap-2 text-sm font-semibold">
               <MapPin className="h-4 w-4 text-primary" />
-              حدّد موقعك لبدء العرض
+              {tr("pickLocation")}
             </div>
             <div className="flex flex-col gap-2 sm:flex-row">
               <div className="relative flex-1">
@@ -185,16 +185,16 @@ function PrayerPage() {
                   value={cityInput}
                   onChange={(e) => setCityInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && searchCity()}
-                  placeholder="ابحث عن مدينة..."
+                  placeholder={tr("cityPlaceholder")}
                   className="pe-9"
                 />
               </div>
               <Button onClick={searchCity} variant="secondary">
-                بحث
+                {tr("search")}
               </Button>
               <Button onClick={useMyLocation} className="bg-gradient-primary">
                 <MapPin className="me-2 h-4 w-4" />
-                استخدم موقعي
+                {tr("useMyLocation")}
               </Button>
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
@@ -260,7 +260,7 @@ function PrayerPage() {
 
         {loading && (
           <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" /> جارٍ التحميل...
+            <Loader2 className="h-4 w-4 animate-spin" /> {tr("loading")}
           </div>
         )}
 
@@ -313,10 +313,10 @@ function PrayerPage() {
         {/* Settings */}
         {coords && (
           <Card className="space-y-4 p-5">
-            <h2 className="font-display text-lg font-bold">إعدادات الحساب</h2>
+            <h2 className="font-display text-lg font-bold">{tr("calcSettings")}</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="space-y-1.5 text-sm">
-                <span className="text-muted-foreground">طريقة الحساب</span>
+                <span className="text-muted-foreground">{tr("calcMethod")}</span>
                 <Select
                   value={String(method)}
                   onValueChange={(v) => setPrayerMethod(Number(v))}
@@ -334,7 +334,7 @@ function PrayerPage() {
                 </Select>
               </label>
               <label className="space-y-1.5 text-sm">
-                <span className="text-muted-foreground">تذكير قبل الأذان</span>
+                <span className="text-muted-foreground">{tr("reminderBefore")}</span>
                 <Select
                   value={String(reminderMinutes)}
                   onValueChange={(v) => setPrayerReminder(Number(v))}
@@ -345,7 +345,7 @@ function PrayerPage() {
                   <SelectContent>
                     {[0, 5, 10, 15, 30].map((n) => (
                       <SelectItem key={n} value={String(n)}>
-                        {n === 0 ? "عند الأذان مباشرة" : `قبل ${n} دقيقة`}
+                        {n === 0 ? tr("remindAtAdhan") : `${tr("reminderBefore")} — ${n}m`}
                       </SelectItem>
                     ))}
                   </SelectContent>
