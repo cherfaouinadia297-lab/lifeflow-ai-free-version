@@ -43,7 +43,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </div>
             <div className="leading-tight">
               <div className="font-display text-lg font-bold text-foreground">LifeFlow AI</div>
-              <div className="text-[11px] text-muted-foreground">مساعدك الذكي لتنظيم اليوم</div>
+              <div className="text-[11px] text-muted-foreground">{t(lang, "appTagline")}</div>
             </div>
           </Link>
 
@@ -52,7 +52,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <span className="font-display text-base font-bold text-primary">
                 {state.progress.level}
               </span>
-              <span className="text-xs text-muted-foreground">المستوى</span>
+              <span className="text-xs text-muted-foreground">{t(lang, "level")}</span>
             </div>
             <span className="text-border">•</span>
             <div className="flex items-center gap-1.5">
