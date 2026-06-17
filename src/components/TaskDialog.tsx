@@ -17,8 +17,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CATEGORIES, getCategory } from "@/lib/categories";
+import { PRIMARY_CATEGORIES, getCategory } from "@/lib/categories";
 import { useStore } from "@/lib/store";
+import { makeI18n } from "@/lib/i18n";
 import type { Task, CategoryKey, RepeatKind } from "@/lib/types";
 import { toast } from "sonner";
 
@@ -30,7 +31,8 @@ interface Props {
 }
 
 export function TaskDialog({ open, onOpenChange, task, defaultDate }: Props) {
-  const { addTask, updateTask } = useStore();
+  const { addTask, updateTask, state } = useStore();
+  const i = makeI18n(state.language);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState(defaultDate ?? new Date().toISOString().slice(0, 10));
@@ -62,7 +64,7 @@ export function TaskDialog({ open, onOpenChange, task, defaultDate }: Props) {
 
   const handleSave = () => {
     if (!title.trim()) {
-      toast.error("الرجاء إدخال اسم النشاط");
+      toast.error(i.t("task.requiredTitle"));
       return;
     }
     const meta = getCategory(category);
@@ -78,10 +80,10 @@ export function TaskDialog({ open, onOpenChange, task, defaultDate }: Props) {
     };
     if (task) {
       updateTask(task.id, payload);
-      toast.success("تم تحديث النشاط");
+      toast.success(i.t("task.updated"));
     } else {
       addTask(payload);
-      toast.success("تمت إضافة النشاط");
+      toast.success(i.t("task.created"));
     }
     onOpenChange(false);
   };
@@ -91,35 +93,35 @@ export function TaskDialog({ open, onOpenChange, task, defaultDate }: Props) {
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="font-display text-xl">
-            {task ? "تعديل النشاط" : "نشاط جديد"}
+            {task ? i.t("task.edit") : i.t("task.new")}
           </DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="title">اسم النشاط</Label>
+            <Label htmlFor="title">{i.t("task.titleLabel")}</Label>
             <Input
               id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="مثلاً: مراجعة الرياضيات"
+              placeholder={i.t("task.titlePlaceholder")}
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="desc">وصف (اختياري)</Label>
+            <Label htmlFor="desc">{i.t("task.descLabel")}</Label>
             <Textarea
               id="desc"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="تفاصيل النشاط..."
+              placeholder={i.t("task.descPlaceholder")}
               rows={2}
             />
           </div>
 
           <div className="grid grid-cols-3 gap-3">
             <div className="grid gap-2">
-              <Label htmlFor="date">التاريخ</Label>
+              <Label htmlFor="date">{i.t("task.date")}</Label>
               <Input
                 id="date"
                 type="date"
@@ -128,7 +130,7 @@ export function TaskDialog({ open, onOpenChange, task, defaultDate }: Props) {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="start">البداية</Label>
+              <Label htmlFor="start">{i.t("task.start")}</Label>
               <Input
                 id="start"
                 type="time"
@@ -137,7 +139,7 @@ export function TaskDialog({ open, onOpenChange, task, defaultDate }: Props) {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="end">النهاية</Label>
+              <Label htmlFor="end">{i.t("task.end")}</Label>
               <Input
                 id="end"
                 type="time"
@@ -149,20 +151,17 @@ export function TaskDialog({ open, onOpenChange, task, defaultDate }: Props) {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="grid gap-2">
-              <Label>التصنيف</Label>
+              <Label>{i.t("task.category")}</Label>
               <Select value={category} onValueChange={(v) => setCategory(v as CategoryKey)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {CATEGORIES.map((c) => (
+                  {PRIMARY_CATEGORIES.map((c) => (
                     <SelectItem key={c.key} value={c.key}>
                       <span className="flex items-center gap-2">
-                        <span
-                          className="h-3 w-3 rounded-full"
-                          style={{ backgroundColor: c.color }}
-                        />
-                        {c.labelAr}
+                        <span>{c.emoji}</span>
+                        {i.t(c.labelKey)}
                       </span>
                     </SelectItem>
                   ))}
@@ -170,15 +169,15 @@ export function TaskDialog({ open, onOpenChange, task, defaultDate }: Props) {
               </Select>
             </div>
             <div className="grid gap-2">
-              <Label>التكرار</Label>
+              <Label>{i.t("task.repeat")}</Label>
               <Select value={repeat} onValueChange={(v) => setRepeat(v as RepeatKind)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">بدون تكرار</SelectItem>
-                  <SelectItem value="daily">يومي</SelectItem>
-                  <SelectItem value="weekly">أسبوعي</SelectItem>
+                  <SelectItem value="none">{i.t("task.repeat.none")}</SelectItem>
+                  <SelectItem value="daily">{i.t("task.repeat.daily")}</SelectItem>
+                  <SelectItem value="weekly">{i.t("task.repeat.weekly")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -187,10 +186,10 @@ export function TaskDialog({ open, onOpenChange, task, defaultDate }: Props) {
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            إلغاء
+            {i.t("common.cancel")}
           </Button>
           <Button onClick={handleSave} className="bg-gradient-primary">
-            حفظ
+            {i.t("common.save")}
           </Button>
         </DialogFooter>
       </DialogContent>

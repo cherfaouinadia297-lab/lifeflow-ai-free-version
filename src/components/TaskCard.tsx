@@ -3,6 +3,7 @@ import type { Task } from "@/lib/types";
 import { getCategory, SUGGESTIONS } from "@/lib/categories";
 import { useStore } from "@/lib/store";
 import { useState } from "react";
+import { makeI18n } from "@/lib/i18n";
 import {
   Popover,
   PopoverContent,
@@ -15,7 +16,8 @@ interface Props {
 }
 
 export function TaskCard({ task, onEdit }: Props) {
-  const { toggleComplete, deleteTask } = useStore();
+  const { toggleComplete, deleteTask, state } = useStore();
+  const i = makeI18n(state.language);
   const meta = getCategory(task.category);
   const Icon = meta.icon;
   const [openTips, setOpenTips] = useState(false);
@@ -73,22 +75,23 @@ export function TaskCard({ task, onEdit }: Props) {
               className="inline-flex items-center gap-1 rounded-full px-2.5 py-1"
               style={{ backgroundColor: `${meta.color}1A`, color: meta.color }}
             >
-              {meta.labelAr}
+              {i.t(meta.labelKey)}
             </span>
             {task.repeat !== "none" && (
               <span className="rounded-full bg-accent px-2.5 py-1 text-accent-foreground">
-                {task.repeat === "daily" ? "يومي" : "أسبوعي"}
+                {i.t(task.repeat === "daily" ? "task.repeat.daily" : "task.repeat.weekly")}
               </span>
             )}
           </div>
         </div>
 
         <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+          {suggestion && (
           <Popover open={openTips} onOpenChange={setOpenTips}>
             <PopoverTrigger asChild>
               <button
                 className="rounded-lg p-2 text-muted-foreground hover:bg-secondary hover:text-primary"
-                aria-label="اقتراحات"
+                aria-label={i.t("task.tipsTitle")}
               >
                 <Sparkles className="h-4 w-4" />
               </button>
@@ -108,17 +111,18 @@ export function TaskCard({ task, onEdit }: Props) {
               </ul>
             </PopoverContent>
           </Popover>
+          )}
           <button
             onClick={() => onEdit(task)}
             className="rounded-lg p-2 text-muted-foreground hover:bg-secondary hover:text-foreground"
-            aria-label="تعديل"
+            aria-label={i.t("common.edit")}
           >
             <Pencil className="h-4 w-4" />
           </button>
           <button
             onClick={() => deleteTask(task.id)}
             className="rounded-lg p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-            aria-label="حذف"
+            aria-label={i.t("common.delete")}
           >
             <Trash2 className="h-4 w-4" />
           </button>

@@ -7,7 +7,8 @@ import { TaskDialog } from "@/components/TaskDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CATEGORIES } from "@/lib/categories";
+import { PRIMARY_CATEGORIES as CATEGORIES } from "@/lib/categories";
+import { makeI18n } from "@/lib/i18n";
 import { useStore } from "@/lib/store";
 import type { CategoryKey, Task } from "@/lib/types";
 import { t, getLangMeta } from "@/lib/i18n";
@@ -140,7 +141,7 @@ function TasksPage() {
                   onClick={() => setCat(c.key)}
                   color={c.color}
                 >
-                  {c.labelAr}
+                  {c.emoji} {t(lang, c.labelKey)}
                 </Chip>
               ))}
             </div>

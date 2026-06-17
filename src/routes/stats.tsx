@@ -75,7 +75,7 @@ function StatsPage() {
   // Category distribution
   const catData = useMemo(() => {
     return CATEGORIES.map((c) => ({
-      name: c.labelAr,
+      name: c.labelKey,
       value: tasks.filter((t) => t.category === c.key && t.completed).length,
       color: c.color,
     })).filter((d) => d.value > 0);
