@@ -63,7 +63,7 @@ export function getCategory(key: CategoryKey): CategoryMeta {
 /** Categories shown in the picker — excludes the legacy aliases. */
 export const PRIMARY_CATEGORIES = CATEGORIES.slice(0, 15);
 
-export const SUGGESTIONS: Record<CategoryKey, { titleAr: string; tipsAr: string[] }> = {
+export const SUGGESTIONS: Partial<Record<CategoryKey, { titleAr: string; tipsAr: string[] }>> = {
   study: {
     titleAr: "نصائح للدراسة الفعّالة",
     tipsAr: [
