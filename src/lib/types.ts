@@ -1,12 +1,24 @@
 export type CategoryKey =
   | "study"
   | "work"
-  | "sport"
+  | "health"
   | "prayer"
+  | "family"
+  | "friends"
+  | "money"
+  | "shopping"
+  | "food"
+  | "entertainment"
+  | "learning"
+  | "tech"
+  | "projects"
+  | "travel"
+  | "daily"
   | "reading"
   | "cooking"
   | "sleep"
-  | "meeting";
+  | "meeting"
+  | "sport";
 
 export type RepeatKind = "none" | "daily" | "weekly";
 
