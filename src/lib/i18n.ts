@@ -946,6 +946,55 @@ const FR: Dict = {
 
 const STRINGS: Record<string, Dict> = { en: EN, ar: AR, fr: FR };
 
+/** Map of legacy flat keys (used across older screens) to the new dot-keys. */
+const LEGACY_ALIASES: Record<string, string> = {
+  appTagline: "appTagline",
+  today: "nav.today", schedule: "nav.schedule", tasks: "nav.tasks",
+  prayer: "nav.prayer", weather: "nav.weather", assistant: "nav.assistant",
+  timer: "nav.timer", stats: "nav.stats", settings: "nav.settings",
+  level: "common.level", streak: "common.streak", xp: "common.xp",
+  newActivity: "home.newActivity", add: "common.add", edit: "common.edit",
+  delete: "common.delete", cancel: "common.cancel", save: "common.save",
+  search: "common.search", refresh: "common.refresh",
+  enableNotifications: "settings.enableNotifications",
+  goodMorning: "greet.morning", goodAfternoon: "greet.afternoon", goodEvening: "greet.evening",
+  todaySchedule: "home.todaySchedule", todayProgress: "home.todayProgress",
+  startDayHint: "home.startDayHint",
+  startFirstActivity: "home.startFirstActivity",
+  addFirstActivityHint: "home.addFirstActivityHint",
+  addActivity: "home.addActivity",
+  progressToNextLevel: "home.progressToNextLevel",
+  allTasks: "tasks.title", all: "tasks.filter.all",
+  active: "tasks.filter.active", done: "tasks.filter.done",
+  allCategories: "tasks.categoriesAll", searchTasks: "tasks.searchPlaceholder",
+  noTasksMatch: "tasks.empty",
+  smartPlanner: "home.smartPlanner", smartPlannerHint: "home.smartPlannerHint",
+  procrastinationTitle: "home.procrastinationTitle",
+  procrastinationHint: "home.procrastinationHint",
+  voiceAddTask: "tasks.voice.add", listening: "tasks.voice.listening",
+  voiceHint: "tasks.voice.hint", voiceUnsupported: "tasks.voice.unsupported",
+  chatPlaceholder: "assistant.placeholder", send: "assistant.send",
+  assistantHello: "assistant.hello", assistantSubtitle: "assistant.subtitle",
+  thinking: "assistant.thinking",
+  language: "settings.language", theme: "settings.theme",
+  themeLight: "settings.theme.light", themeDark: "settings.theme.dark", themeSystem: "settings.theme.system",
+  ringtone: "settings.ringtone", test: "settings.testRingtone", volume: "settings.volume",
+  stopAlarm: "settings.stopAlarm",
+  duration: "timer.duration", start: "timer.start", pause: "timer.pause",
+  resume: "timer.resume", reset: "timer.reset", timerDone: "timer.done",
+  fajr: "prayer.fajr", sunrise: "prayer.sunrise", dhuhr: "prayer.dhuhr",
+  asr: "prayer.asr", maghrib: "prayer.maghrib", isha: "prayer.isha",
+  nextPrayer: "prayer.next", calcMethod: "prayer.method",
+  reminderBefore: "prayer.reminder", remindAtAdhan: "prayer.reminderAt",
+  pickLocation: "prayer.pickLocation", useMyLocation: "prayer.useMyLocation",
+  updateLocation: "prayer.update", changeCity: "prayer.changeCity",
+  cityPlaceholder: "prayer.cityPlaceholder", calcSettings: "prayer.calcSettings",
+  prayerLoadError: "prayer.loadError", prayerSourceNote: "prayer.source",
+  humidity: "weather.humidity", wind: "weather.wind", feelsLike: "weather.feelsLike",
+  forecast: "weather.next7", next7days: "weather.next7", todayHourly: "weather.hourly",
+  loading: "common.loading",
+};
+
 function interpolate(s: string, vars?: Record<string, string | number>): string {
   if (!vars) return s;
   return s.replace(/\{(\w+)\}/g, (_, k) =>
@@ -956,7 +1005,8 @@ function interpolate(s: string, vars?: Record<string, string | number>): string 
 /** Backwards-compatible: t(lang, key, vars?). */
 export function t(lang: string, key: string, vars?: Record<string, string | number>): string {
   const dict = STRINGS[lang] ?? STRINGS.en;
-  const value = dict[key] ?? STRINGS.en[key] ?? key;
+  const resolved = LEGACY_ALIASES[key] ?? key;
+  const value = dict[resolved] ?? dict[key] ?? STRINGS.en[resolved] ?? STRINGS.en[key] ?? key;
   return interpolate(value, vars);
 }
 
