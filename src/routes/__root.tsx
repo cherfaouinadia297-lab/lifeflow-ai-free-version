@@ -90,11 +90,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "LifeFlow AI — مساعدك الذكي لتنظيم اليوم" },
       { name: "description", content: "نظّم وقتك، تابع عاداتك، وحقّق أهدافك مع LifeFlow AI." },
       { name: "theme-color", content: "#2E8B8B" },
-      { property: "og:title", content: "LifeFlow AI" },
-      { property: "og:description", content: "مساعدك الذكي لإدارة الحياة اليومية." },
+      { property: "og:title", content: "LifeFlow AI — مساعدك الذكي لتنظيم اليوم" },
+      { property: "og:description", content: "نظّم وقتك، تابع عاداتك، وحقّق أهدافك مع LifeFlow AI." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "LifeFlow AI — مساعدك الذكي لتنظيم اليوم" },
+      { name: "twitter:description", content: "نظّم وقتك، تابع عاداتك، وحقّق أهدافك مع LifeFlow AI." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/AtxHtqXdw3Mmn38OnUyv6653KgU2/social-images/social-1782146160713-ChatGPT_Image_22_يونيو_2026،_06_34_49_م.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/AtxHtqXdw3Mmn38OnUyv6653KgU2/social-images/social-1782146160713-ChatGPT_Image_22_يونيو_2026،_06_34_49_م.webp" },
     ],
     links: [
       {
