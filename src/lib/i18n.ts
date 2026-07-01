@@ -1318,6 +1318,7 @@ const LEGACY_ALIASES: Record<string, string> = {
   humidity: "weather.humidity", wind: "weather.wind", feelsLike: "weather.feelsLike",
   forecast: "weather.next7", next7days: "weather.next7", todayHourly: "weather.hourly",
   loading: "common.loading",
+  news: "nav.news",
 };
 
 function interpolate(s: string, vars?: Record<string, string | number>): string {
