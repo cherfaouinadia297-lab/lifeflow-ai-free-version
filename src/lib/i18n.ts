@@ -15,6 +15,15 @@ export const LANGUAGES: LangMeta[] = [
   { code: "en", label: "English",  dir: "ltr", locale: "en-US", country: "US", newsLang: "en" },
   { code: "ar", label: "العربية",  dir: "rtl", locale: "ar-EG", country: "SA", newsLang: "ar" },
   { code: "fr", label: "Français", dir: "ltr", locale: "fr-FR", country: "FR", newsLang: "fr" },
+  { code: "es", label: "Español",  dir: "ltr", locale: "es-ES", country: "ES", newsLang: "es" },
+  { code: "de", label: "Deutsch",  dir: "ltr", locale: "de-DE", country: "DE", newsLang: "de" },
+  { code: "it", label: "Italiano", dir: "ltr", locale: "it-IT", country: "IT", newsLang: "it" },
+  { code: "pt", label: "Português",dir: "ltr", locale: "pt-PT", country: "PT", newsLang: "pt" },
+  { code: "tr", label: "Türkçe",   dir: "ltr", locale: "tr-TR", country: "TR", newsLang: "tr" },
+  { code: "ru", label: "Русский",  dir: "ltr", locale: "ru-RU", country: "RU", newsLang: "ru" },
+  { code: "zh", label: "中文",      dir: "ltr", locale: "zh-CN", country: "CN", newsLang: "zh" },
+  { code: "ja", label: "日本語",     dir: "ltr", locale: "ja-JP", country: "JP", newsLang: "ja" },
+  { code: "ko", label: "한국어",     dir: "ltr", locale: "ko-KR", country: "KR", newsLang: "ko" },
 ];
 
 export function getLangMeta(code: string): LangMeta {
