@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
 import {
   Newspaper, Search, Bookmark, BookmarkCheck, Share2, Sparkles,
   ExternalLink, RefreshCw, Loader2, ShieldCheck, Clock, Globe,
@@ -47,8 +46,6 @@ function NewsPage() {
   const { state } = useStore();
   const i18n = useMemo(() => makeI18n(state.language), [state.language]);
   const meta = getLangMeta(state.language);
-  const fetchNewsFn = useServerFn(fetchNews);
-
   const [category, setCategory] = useState<CategoryKey>("general");
   const [query, setQuery] = useState("");
   const [pending, setPending] = useState("");
@@ -63,7 +60,7 @@ function NewsPage() {
   const load = useCallback(async () => {
     setLoading(true); setError(null);
     try {
-      const res = await fetchNewsFn({ data: {
+      const res = await fetchNews({ data: {
         category, lang: meta.newsLang, country: meta.country.toLowerCase(),
         q: query.trim() || undefined, max: 15,
       }});
@@ -74,7 +71,7 @@ function NewsPage() {
       setError(e instanceof Error ? e.message : String(e));
       setArticles([]);
     } finally { setLoading(false); }
-  }, [category, meta.newsLang, meta.country, query, fetchNewsFn, i18n]);
+  }, [category, meta.newsLang, meta.country, query, i18n]);
 
   useEffect(() => { void load(); }, [load]);
 
@@ -216,7 +213,6 @@ function ArticleCard({
   i18n: ReturnType<typeof makeI18n>;
   dir: "ltr" | "rtl";
 }) {
-  const summarize = useServerFn(summarizeArticle);
   const [expanded, setExpanded] = useState(false);
   const [summary, setSummary] = useState<{ summary: string; insight: string } | null>(null);
   const [loading, setLoading] = useState(false);
@@ -227,7 +223,7 @@ function ArticleCard({
     if (!summary && !loading) {
       setLoading(true); setErr(null);
       try {
-        const res = await summarize({ data: {
+        const res = await summarizeArticle({ data: {
           title: article.title,
           content: (article.content || article.description || article.title).slice(0, 7000),
           language: i18n.lang,
