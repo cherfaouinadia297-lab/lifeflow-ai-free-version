@@ -10,6 +10,7 @@ import {
   Timer as TimerIcon,
   Moon,
   CloudSun,
+  Newspaper,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useStore } from "@/lib/store";
@@ -21,6 +22,7 @@ const NAV = [
   { to: "/tasks", key: "tasks", icon: ListChecks },
   { to: "/prayer", key: "prayer", icon: Moon },
   { to: "/weather", key: "weather", icon: CloudSun },
+  { to: "/news", key: "news", icon: Newspaper },
   { to: "/assistant", key: "assistant", icon: Bot },
   { to: "/timer", key: "timer", icon: TimerIcon },
   { to: "/stats", key: "stats", icon: BarChart3 },
