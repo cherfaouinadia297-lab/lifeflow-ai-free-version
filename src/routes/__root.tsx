@@ -17,6 +17,11 @@ import { notify, scheduleTaskAlarms } from "../lib/notifications";
 import type { RingtoneId } from "../lib/sound";
 import { startAlarm, stopAlarm } from "../lib/sound";
 import { registerNotificationSW } from "../lib/sw-register";
+import {
+  isNative,
+  requestNativePermissions,
+  syncTaskAlarms,
+} from "../lib/native-alarms";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog";
 import { Button } from "../components/ui/button";
 import { BellRing } from "lucide-react";
@@ -157,7 +162,16 @@ function NotificationScheduler() {
   // Register the service worker once
   useEffect(() => {
     void registerNotificationSW();
+    // On native Android, ask for notification/exact-alarm permission once.
+    if (isNative()) void requestNativePermissions();
   }, []);
+
+  // Native: sync all scheduled alarms with the OS whenever tasks change.
+  // The OS then fires them exactly on time even if the app is closed.
+  useEffect(() => {
+    if (!isNative()) return;
+    void syncTaskAlarms(state.tasks);
+  }, [state.tasks]);
 
   // Precise per-task alarm scheduling (re-runs whenever tasks change)
   useEffect(() => {
