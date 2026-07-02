@@ -3,11 +3,16 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 import { ensureNotificationPermission } from "@/lib/notifications";
-import { Moon, Sun, Bell, Languages, Trash2, Monitor, Music2, Volume2 } from "lucide-react";
+import {
+  Moon, Sun, Bell, Languages, Trash2, Monitor, Music2, Volume2, Smartphone, Zap,
+} from "lucide-react";
 import { toast } from "sonner";
 import { LANGUAGES } from "@/lib/i18n";
 import { RINGTONES, playRingtone, type RingtoneId } from "@/lib/sound";
 import { Slider } from "@/components/ui/slider";
+import {
+  isNative, requestNativePermissions, fireTestAlarm,
+} from "@/lib/native-alarms";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -74,6 +79,37 @@ function SettingsPage() {
             تفعيل الإشعارات
           </Button>
         </Section>
+
+        {isNative() && (
+          <Section icon={<Smartphone className="h-4 w-4" />} title="نظام التنبيهات الأصلي (Android)">
+            <p className="mb-3 text-sm text-muted-foreground">
+              يستخدم LifeFlow نظام AlarmManager الرسمي في أندرويد لضمان دقة التنبيهات
+              حتى عند إغلاق التطبيق أو إعادة تشغيل الهاتف. تأكّد من منح جميع الأذونات
+              وإيقاف تحسين البطارية لهذا التطبيق.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                className="bg-gradient-primary"
+                onClick={async () => {
+                  const ok = await requestNativePermissions();
+                  if (ok) toast.success("تم منح إذن الإشعارات");
+                  else toast.error("لم يتم منح الإذن — افتح إعدادات النظام");
+                }}
+              >
+                <Bell className="me-1 h-4 w-4" /> منح الأذونات
+              </Button>
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  await fireTestAlarm();
+                  toast.info("سيرنّ منبه الاختبار خلال 3 ثوانٍ");
+                }}
+              >
+                <Zap className="me-1 h-4 w-4" /> اختبار المنبه
+              </Button>
+            </div>
+          </Section>
+        )}
 
         <Section icon={<Music2 className="h-4 w-4" />} title="نغمة التنبيه">
           <div className="flex flex-wrap gap-2">
