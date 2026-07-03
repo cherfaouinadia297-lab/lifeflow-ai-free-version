@@ -529,6 +529,13 @@ const AR: Dict = {
   "settings.resetDone": "تمت إعادة الضبط",
   "settings.footer": "LifeFlow AI · بياناتك محفوظة محليًا في متصفحك.",
   "settings.stopAlarm": "إيقاف التنبيه",
+  "settings.native.title": "نظام التنبيهات الأصلي (Android)",
+  "settings.native.desc": "يستخدم LifeFlow نظام AlarmManager الرسمي في أندرويد لضمان دقة التنبيهات حتى عند إغلاق التطبيق أو إعادة تشغيل الهاتف. تأكّد من منح جميع الأذونات وإيقاف تحسين البطارية لهذا التطبيق.",
+  "settings.native.grant": "منح الأذونات",
+  "settings.native.granted": "تم منح إذن الإشعارات",
+  "settings.native.denied": "لم يتم منح الإذن — افتح إعدادات النظام",
+  "settings.native.test": "اختبار المنبه",
+  "settings.native.testing": "سيرنّ منبه الاختبار خلال 3 ثوانٍ",
 
   "prayer.title": "الصلاة",
   "prayer.source": "المصدر: AlAdhan API",
