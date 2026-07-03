@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { LANGUAGES } from "@/lib/i18n";
+import { makeI18n } from "@/lib/i18n";
 import { RINGTONES, playRingtone, type RingtoneId } from "@/lib/sound";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -26,16 +27,17 @@ export const Route = createFileRoute("/settings")({
 
 function SettingsPage() {
   const { state, setLanguage, setTheme, setRingtone, setVolume, resetAll } = useStore();
+  const { t } = makeI18n(state.language);
 
   return (
     <AppShell>
       <div className="mx-auto max-w-2xl space-y-5">
         <div>
-          <h1 className="font-display text-2xl font-bold text-foreground">الإعدادات</h1>
-          <p className="text-sm text-muted-foreground">خصّص التطبيق ليناسبك.</p>
+          <h1 className="font-display text-2xl font-bold text-foreground">{t("settings.title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("settings.subtitle")}</p>
         </div>
 
-        <Section icon={<Languages className="h-4 w-4" />} title="اللغة">
+        <Section icon={<Languages className="h-4 w-4" />} title={t("settings.language")}>
           <div className="flex flex-wrap gap-2">
             {LANGUAGES.map((l) => (
               <Choice
@@ -49,34 +51,32 @@ function SettingsPage() {
           </div>
         </Section>
 
-        <Section icon={<Sun className="h-4 w-4" />} title="المظهر">
+        <Section icon={<Sun className="h-4 w-4" />} title={t("settings.theme")}>
           <div className="flex gap-2">
             <Choice active={state.theme === "light"} onClick={() => setTheme("light")}>
-              <Sun className="me-1 h-4 w-4" /> فاتح
+              <Sun className="me-1 h-4 w-4" /> {t("settings.theme.light")}
             </Choice>
             <Choice active={state.theme === "dark"} onClick={() => setTheme("dark")}>
-              <Moon className="me-1 h-4 w-4" /> داكن
+              <Moon className="me-1 h-4 w-4" /> {t("settings.theme.dark")}
             </Choice>
             <Choice active={state.theme === "system"} onClick={() => setTheme("system")}>
-              <Monitor className="me-1 h-4 w-4" /> النظام
+              <Monitor className="me-1 h-4 w-4" /> {t("settings.theme.system")}
             </Choice>
           </div>
         </Section>
 
-        <Section icon={<Bell className="h-4 w-4" />} title="الإشعارات">
-          <p className="mb-3 text-sm text-muted-foreground">
-            فعّل إشعارات المتصفح لتلقّي تذكير عند بدء كل نشاط (يعمل ما دام التطبيق مفتوحًا).
-          </p>
+        <Section icon={<Bell className="h-4 w-4" />} title={t("settings.notifications")}>
+          <p className="mb-3 text-sm text-muted-foreground">{t("settings.notificationsHint")}</p>
           <Button
             onClick={async () => {
               const p = await ensureNotificationPermission();
-              if (p === "granted") toast.success("تم تفعيل الإشعارات");
-              else toast.error("لم يتم منح الإذن");
+              if (p === "granted") toast.success(t("settings.notificationsGranted"));
+              else toast.error(t("settings.notificationsDenied"));
             }}
             className="bg-gradient-primary"
           >
             <Bell className="me-1 h-4 w-4" />
-            تفعيل الإشعارات
+            {t("settings.enableNotifications")}
           </Button>
         </Section>
 
@@ -111,7 +111,7 @@ function SettingsPage() {
           </Section>
         )}
 
-        <Section icon={<Music2 className="h-4 w-4" />} title="نغمة التنبيه">
+        <Section icon={<Music2 className="h-4 w-4" />} title={t("settings.ringtone")}>
           <div className="flex flex-wrap gap-2">
             {RINGTONES.map((r) => (
               <Choice
@@ -144,29 +144,27 @@ function SettingsPage() {
             className="mt-3"
             onClick={() => playRingtone(state.ringtone as RingtoneId, state.volume)}
           >
-            تجربة النغمة
+            {t("settings.testRingtone")}
           </Button>
         </Section>
 
-        <Section icon={<Trash2 className="h-4 w-4" />} title="إعادة الضبط">
-          <p className="mb-3 text-sm text-muted-foreground">
-            احذف جميع البيانات والتقدّم. لا يمكن التراجع عن هذا الإجراء.
-          </p>
+        <Section icon={<Trash2 className="h-4 w-4" />} title={t("settings.reset")}>
+          <p className="mb-3 text-sm text-muted-foreground">{t("settings.resetHint")}</p>
           <Button
             variant="destructive"
             onClick={() => {
-              if (confirm("هل أنت متأكد من حذف جميع البيانات؟")) {
+              if (confirm(t("settings.resetConfirm"))) {
                 resetAll();
-                toast.success("تمت إعادة الضبط");
+                toast.success(t("settings.resetDone"));
               }
             }}
           >
-            مسح كل البيانات
+            {t("settings.resetButton")}
           </Button>
         </Section>
 
         <div className="pt-4 text-center text-xs text-muted-foreground">
-          LifeFlow AI · بياناتك محفوظة محليًا في متصفحك.
+          {t("settings.footer")}
         </div>
       </div>
     </AppShell>
