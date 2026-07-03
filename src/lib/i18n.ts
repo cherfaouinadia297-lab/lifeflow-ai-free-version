@@ -215,6 +215,13 @@ const EN: Dict = {
   "settings.resetDone": "Reset complete",
   "settings.footer": "LifeFlow AI · your data stays in your browser.",
   "settings.stopAlarm": "Stop alarm",
+  "settings.native.title": "Native alarm system (Android)",
+  "settings.native.desc": "LifeFlow uses Android's official AlarmManager for reliable alarms even when the app is closed or the phone reboots. Make sure to grant every permission and disable battery optimisation for this app.",
+  "settings.native.grant": "Grant permissions",
+  "settings.native.granted": "Notification permission granted",
+  "settings.native.denied": "Permission denied — open system settings",
+  "settings.native.test": "Test alarm",
+  "settings.native.testing": "Test alarm will ring in 3 seconds",
 
   // Prayer
   "prayer.title": "Prayer",
@@ -522,6 +529,13 @@ const AR: Dict = {
   "settings.resetDone": "تمت إعادة الضبط",
   "settings.footer": "LifeFlow AI · بياناتك محفوظة محليًا في متصفحك.",
   "settings.stopAlarm": "إيقاف التنبيه",
+  "settings.native.title": "نظام التنبيهات الأصلي (Android)",
+  "settings.native.desc": "يستخدم LifeFlow نظام AlarmManager الرسمي في أندرويد لضمان دقة التنبيهات حتى عند إغلاق التطبيق أو إعادة تشغيل الهاتف. تأكّد من منح جميع الأذونات وإيقاف تحسين البطارية لهذا التطبيق.",
+  "settings.native.grant": "منح الأذونات",
+  "settings.native.granted": "تم منح إذن الإشعارات",
+  "settings.native.denied": "لم يتم منح الإذن — افتح إعدادات النظام",
+  "settings.native.test": "اختبار المنبه",
+  "settings.native.testing": "سيرنّ منبه الاختبار خلال 3 ثوانٍ",
 
   "prayer.title": "الصلاة",
   "prayer.source": "المصدر: AlAdhan API",

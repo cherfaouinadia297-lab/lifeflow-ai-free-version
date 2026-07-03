@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { useStore } from "@/lib/store";
 import { describeWeatherCode, fetchWeather } from "@/lib/weather";
 import { geocodeCity, reverseGeocode } from "@/lib/prayer";
+import { makeI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/weather")({
   head: () => ({
@@ -21,6 +22,8 @@ export const Route = createFileRoute("/weather")({
 
 function WeatherPage() {
   const { state, setWeatherCoords, setWeatherCache } = useStore();
+  const i18n = makeI18n(state.language);
+  const { t } = i18n;
   const { coords, cache } = state.weather;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +36,7 @@ function WeatherPage() {
       const w = await fetchWeather(lat, lng, city);
       setWeatherCache(w);
     } catch {
-      setError("تعذّر جلب حالة الطقس.");
+      setError(t("weather.fetchError"));
     } finally {
       setLoading(false);
     }
@@ -48,7 +51,7 @@ function WeatherPage() {
 
   const useMyLocation = () => {
     if (!("geolocation" in navigator)) {
-      setError("المتصفح لا يدعم تحديد الموقع.");
+      setError(t("weather.geolocationUnsupported"));
       return;
     }
     setLoading(true);
@@ -58,7 +61,7 @@ function WeatherPage() {
         setWeatherCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude, city });
       },
       () => {
-        setError("تعذّر الوصول إلى موقعك.");
+        setError(t("prayer.locationDenied"));
         setLoading(false);
       },
     );
@@ -69,7 +72,7 @@ function WeatherPage() {
     setLoading(true);
     const r = await geocodeCity(cityInput.trim());
     if (!r) {
-      setError("لم نعثر على المدينة.");
+      setError(t("weather.cityNotFound"));
       setLoading(false);
       return;
     }
@@ -81,28 +84,28 @@ function WeatherPage() {
   const desc = cur ? describeWeatherCode(cur.code, cur.isDay) : null;
   const greeting = cur
     ? cur.code === 0
-      ? "يوم مشمس رائع — استمتع به!"
+      ? t("weather.greet.sunny")
       : cur.code >= 61 && cur.code <= 82
-        ? "جو ممطر هادئ، خذ معك مظلتك."
+        ? t("weather.greet.rain")
         : cur.code >= 71 && cur.code <= 86
-          ? "أجواء ثلجية، البس ما يدفئك."
+          ? t("weather.greet.snow")
           : cur.code >= 95
-            ? "عاصفة رعدية، يفضّل البقاء بالداخل."
-            : "أجواء معتدلة، يوم لطيف."
+            ? t("weather.greet.storm")
+            : t("weather.greet.mild")
     : "";
 
   return (
     <AppShell>
       <div className="space-y-6">
         <header className="space-y-1">
-          <h1 className="font-display text-2xl font-bold">الطقس</h1>
-          <p className="text-sm text-muted-foreground">حالة الجو الآن والتوقعات بدقة عالية.</p>
+          <h1 className="font-display text-2xl font-bold">{t("weather.title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("weather.subtitle")}</p>
         </header>
 
         {!coords ? (
           <Card className="space-y-4 p-5">
             <div className="flex items-center gap-2 text-sm font-semibold">
-              <MapPin className="h-4 w-4 text-primary" /> اختر موقعك
+              <MapPin className="h-4 w-4 text-primary" /> {t("weather.pickLocation")}
             </div>
             <div className="flex flex-col gap-2 sm:flex-row">
               <div className="relative flex-1">
@@ -111,13 +114,13 @@ function WeatherPage() {
                   value={cityInput}
                   onChange={(e) => setCityInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && searchCity()}
-                  placeholder="ابحث عن مدينة..."
+                  placeholder={t("weather.cityPlaceholder")}
                   className="pe-9"
                 />
               </div>
-              <Button onClick={searchCity} variant="secondary">بحث</Button>
+              <Button onClick={searchCity} variant="secondary">{t("common.search")}</Button>
               <Button onClick={useMyLocation} className="bg-gradient-primary">
-                <MapPin className="me-2 h-4 w-4" /> استخدم موقعي
+                <MapPin className="me-2 h-4 w-4" /> {t("weather.useMyLocation")}
               </Button>
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
@@ -147,7 +150,7 @@ function WeatherPage() {
                     className="bg-white/15 text-primary-foreground hover:bg-white/25"
                     onClick={() => coords && refresh(coords.lat, coords.lng, coords.city)}
                   >
-                    <RefreshCw className="me-1.5 h-3.5 w-3.5" /> تحديث
+                    <RefreshCw className="me-1.5 h-3.5 w-3.5" /> {t("common.refresh")}
                   </Button>
                   <Button
                     size="sm"
@@ -155,7 +158,7 @@ function WeatherPage() {
                     className="bg-white/15 text-primary-foreground hover:bg-white/25"
                     onClick={() => setWeatherCoords(null)}
                   >
-                    تغيير المدينة
+                    {t("weather.changeCity")}
                   </Button>
                 </div>
               </div>
@@ -174,18 +177,18 @@ function WeatherPage() {
                 <div className="mt-5 grid grid-cols-3 gap-2 text-xs">
                   <div className="rounded-xl bg-white/15 p-3">
                     <ThermometerSun className="mb-1 h-4 w-4" />
-                    <div className="opacity-80">الإحساس</div>
+                    <div className="opacity-80">{t("weather.feelsLike")}</div>
                     <div className="text-base font-bold">{Math.round(cur.apparent)}°</div>
                   </div>
                   <div className="rounded-xl bg-white/15 p-3">
                     <Droplets className="mb-1 h-4 w-4" />
-                    <div className="opacity-80">الرطوبة</div>
+                    <div className="opacity-80">{t("weather.humidity")}</div>
                     <div className="text-base font-bold">{cur.humidity}%</div>
                   </div>
                   <div className="rounded-xl bg-white/15 p-3">
                     <Wind className="mb-1 h-4 w-4" />
-                    <div className="opacity-80">الرياح</div>
-                    <div className="text-base font-bold">{Math.round(cur.windSpeed)} كم/س</div>
+                    <div className="opacity-80">{t("weather.wind")}</div>
+                    <div className="text-base font-bold">{Math.round(cur.windSpeed)} {t("weather.windUnit")}</div>
                   </div>
                 </div>
               )}
@@ -194,14 +197,11 @@ function WeatherPage() {
             {/* Hourly */}
             {cache && cache.hourly.length > 0 && (
               <Card className="p-4">
-                <h2 className="mb-3 font-display text-base font-bold">ساعات اليوم</h2>
+                <h2 className="mb-3 font-display text-base font-bold">{t("weather.hourly")}</h2>
                 <div className="flex gap-2 overflow-x-auto pb-1">
                   {cache.hourly.map((h) => {
                     const d = describeWeatherCode(h.code, true);
-                    const hour = new Date(h.time).toLocaleTimeString("ar-EG", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    });
+                    const hour = i18n.formatTime(new Date(h.time));
                     return (
                       <div
                         key={h.time}
@@ -220,14 +220,14 @@ function WeatherPage() {
             {/* Daily */}
             {cache && cache.daily.length > 0 && (
               <Card className="p-4">
-                <h2 className="mb-3 font-display text-base font-bold">خلال 7 أيام</h2>
+                <h2 className="mb-3 font-display text-base font-bold">{t("weather.next7")}</h2>
                 <div className="divide-y divide-border/50">
                   {cache.daily.map((d, i) => {
                     const desc2 = describeWeatherCode(d.code, true);
                     const day =
                       i === 0
-                        ? "اليوم"
-                        : new Date(d.date).toLocaleDateString("ar-EG", { weekday: "long" });
+                        ? t("common.today")
+                        : i18n.formatDate(new Date(d.date), { weekday: "long", year: undefined, month: undefined, day: undefined });
                     return (
                       <div
                         key={d.date}
@@ -252,7 +252,7 @@ function WeatherPage() {
 
         {loading && (
           <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" /> جارٍ التحميل...
+            <Loader2 className="h-4 w-4 animate-spin" /> {t("common.loading")}
           </div>
         )}
         {error && coords && <p className="text-sm text-destructive">{error}</p>}

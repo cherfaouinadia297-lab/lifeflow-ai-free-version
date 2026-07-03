@@ -10,6 +10,7 @@ import { useStore } from "@/lib/store";
 import { getCategory } from "@/lib/categories";
 import type { Task } from "@/lib/types";
 import { toLocalISO } from "@/lib/local-date";
+import { makeI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/schedule")({
   head: () => ({
@@ -27,6 +28,8 @@ const toISO = toLocalISO;
 
 function SchedulePage() {
   const { state } = useStore();
+  const i18n = makeI18n(state.language);
+  const { t } = i18n;
   const [view, setView] = useState<View>("day");
   const [cursor, setCursor] = useState<Date>(new Date());
   const [open, setOpen] = useState(false);
@@ -44,7 +47,7 @@ function SchedulePage() {
     <AppShell>
       <div className="space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="font-display text-2xl font-bold text-foreground">الجدول</h1>
+          <h1 className="font-display text-2xl font-bold text-foreground">{t("schedule.title")}</h1>
           <Button
             onClick={() => {
               setEditing(null);
@@ -53,16 +56,16 @@ function SchedulePage() {
             className="bg-gradient-primary"
           >
             <Plus className="me-1 h-4 w-4" />
-            نشاط جديد
+            {t("home.newActivity")}
           </Button>
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card p-3 shadow-soft">
           <Tabs value={view} onValueChange={(v) => setView(v as View)}>
             <TabsList>
-              <TabsTrigger value="day">يومي</TabsTrigger>
-              <TabsTrigger value="week">أسبوعي</TabsTrigger>
-              <TabsTrigger value="month">شهري</TabsTrigger>
+              <TabsTrigger value="day">{t("schedule.day")}</TabsTrigger>
+              <TabsTrigger value="week">{t("schedule.week")}</TabsTrigger>
+              <TabsTrigger value="month">{t("schedule.month")}</TabsTrigger>
             </TabsList>
           </Tabs>
 
@@ -71,7 +74,7 @@ function SchedulePage() {
               <ChevronRight className="h-4 w-4" />
             </Button>
             <Button variant="outline" size="sm" onClick={() => setCursor(new Date())}>
-              اليوم
+              {t("common.today")}
             </Button>
             <Button variant="ghost" size="icon" onClick={() => shift(1)}>
               <ChevronLeft className="h-4 w-4" />
@@ -116,18 +119,13 @@ function SchedulePage() {
     const items = state.tasks
       .filter((t) => t.date === iso)
       .sort((a, b) => a.startTime.localeCompare(b.startTime));
-    const label = date.toLocaleDateString("ar-EG", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
+    const label = i18n.formatDate(date);
     return (
       <div>
         <div className="mb-3 font-display text-lg text-foreground">{label}</div>
         {items.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-            لا توجد أنشطة في هذا اليوم.
+            {t("schedule.empty")}
           </div>
         ) : (
           <div className="grid gap-3">
@@ -168,7 +166,7 @@ function SchedulePage() {
             >
               <div className="mb-2 flex items-center justify-between">
                 <div className="font-display text-sm font-bold text-foreground">
-                  {d.toLocaleDateString("ar-EG", { weekday: "short" })}
+                  {i18n.formatDate(d, { weekday: "short" })}
                 </div>
                 <div
                   className={`grid h-7 w-7 place-items-center rounded-full text-xs ${
@@ -183,7 +181,7 @@ function SchedulePage() {
               <div className="space-y-1.5">
                 {items.length === 0 && (
                   <div className="rounded-md border border-dashed border-border p-2 text-center text-[11px] text-muted-foreground">
-                    لا أنشطة
+                    {t("schedule.none")}
                   </div>
                 )}
                 {items.slice(0, 4).map((t) => {
@@ -201,7 +199,7 @@ function SchedulePage() {
                 })}
                 {items.length > 4 && (
                   <div className="text-center text-[11px] text-muted-foreground">
-                    + {items.length - 4} أخرى
+                    {t("schedule.moreCount", { count: items.length - 4 })}
                   </div>
                 )}
               </div>
@@ -222,9 +220,15 @@ function SchedulePage() {
     for (let i = 0; i < startOffset; i++) cells.push(null);
     for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(year, month, d));
     while (cells.length % 7 !== 0) cells.push(null);
-    const monthLabel = date.toLocaleDateString("ar-EG", { month: "long", year: "numeric" });
+    const monthLabel = i18n.formatDate(date, { month: "long", year: "numeric", weekday: undefined, day: undefined });
     const todayIso = toISO(new Date());
-    const weekdays = ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"];
+    // Localized weekday labels, starting Saturday
+    const wdBase = new Date(2024, 5, 1); // a Saturday
+    const weekdays = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(wdBase);
+      d.setDate(d.getDate() + i);
+      return i18n.formatDate(d, { weekday: "short", year: undefined, month: undefined, day: undefined });
+    });
     return (
       <div>
         <div className="mb-3 font-display text-lg text-foreground">{monthLabel}</div>

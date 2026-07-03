@@ -5,7 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 import { askAssistant } from "@/lib/assistant.functions";
-import { t } from "@/lib/i18n";
+import { makeI18n } from "@/lib/i18n";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/assistant")({
@@ -20,18 +20,14 @@ export const Route = createFileRoute("/assistant")({
 
 type Msg = { role: "user" | "assistant"; content: string };
 
-const SUGGESTIONS_AR = [
-  "ساعدني أرتب مهامي اليوم",
-  "اقترح لي خطة دراسية لمدة ساعة",
-  "كيف أبني عادة القراءة اليومية؟",
-  "اقترح لي تمرين رياضي قصير",
-];
-
 function AssistantPage() {
   const { state } = useStore();
+  const i18n = makeI18n(state.language);
+  const { t } = i18n;
   const lang = state.language;
+  const suggestions = [t("assistant.s1"), t("assistant.s2"), t("assistant.s3"), t("assistant.s4")];
   const [messages, setMessages] = useState<Msg[]>([
-    { role: "assistant", content: t(lang, "assistantHello") },
+    { role: "assistant", content: t("assistant.hello") },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -69,9 +65,9 @@ function AssistantPage() {
       setMessages((m) => [...m, { role: "assistant", content: res.reply || "..." }]);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "error";
-      if (msg === "rate_limited") toast.error("تجاوزت حد الاستخدام، حاول لاحقًا");
-      else if (msg === "credits_exhausted") toast.error("نفدت أرصدة الذكاء الاصطناعي");
-      else toast.error("تعذّر الاتصال بالمساعد");
+      if (msg === "rate_limited") toast.error(t("assistant.errorRate"));
+      else if (msg === "credits_exhausted") toast.error(t("assistant.errorCredits"));
+      else toast.error(t("assistant.errorGeneric"));
     } finally {
       setLoading(false);
     }
@@ -85,8 +81,8 @@ function AssistantPage() {
             <Bot className="h-5 w-5" />
           </span>
           <div>
-            <h1 className="font-display text-2xl font-bold text-foreground">{t(lang, "assistant")}</h1>
-            <p className="text-sm text-muted-foreground">مساعدك الذكي لإنجاز المهام</p>
+            <h1 className="font-display text-2xl font-bold text-foreground">{t("assistant.title")}</h1>
+            <p className="text-sm text-muted-foreground">{t("assistant.subtitle")}</p>
           </div>
         </div>
 
@@ -122,7 +118,7 @@ function AssistantPage() {
                 <Sparkles className="h-4 w-4 animate-pulse" />
               </div>
               <div className="rounded-2xl bg-secondary px-4 py-2 text-sm text-muted-foreground">
-                يفكر...
+                {t("assistant.thinking")}
               </div>
             </div>
           )}
@@ -131,7 +127,7 @@ function AssistantPage() {
 
         {messages.length <= 1 && (
           <div className="flex flex-wrap gap-2">
-            {SUGGESTIONS_AR.map((s) => (
+            {suggestions.map((s) => (
               <button
                 key={s}
                 onClick={() => void send(s)}
@@ -153,7 +149,7 @@ function AssistantPage() {
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={t(lang, "chatPlaceholder")}
+            placeholder={t("assistant.placeholder")}
             className="flex-1 rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground shadow-soft focus:border-primary focus:outline-none"
             disabled={loading}
           />
