@@ -81,31 +81,27 @@ function SettingsPage() {
         </Section>
 
         {isNative() && (
-          <Section icon={<Smartphone className="h-4 w-4" />} title="نظام التنبيهات الأصلي (Android)">
-            <p className="mb-3 text-sm text-muted-foreground">
-              يستخدم LifeFlow نظام AlarmManager الرسمي في أندرويد لضمان دقة التنبيهات
-              حتى عند إغلاق التطبيق أو إعادة تشغيل الهاتف. تأكّد من منح جميع الأذونات
-              وإيقاف تحسين البطارية لهذا التطبيق.
-            </p>
+          <Section icon={<Smartphone className="h-4 w-4" />} title={t("settings.native.title")}>
+            <p className="mb-3 text-sm text-muted-foreground">{t("settings.native.desc")}</p>
             <div className="flex flex-wrap gap-2">
               <Button
                 className="bg-gradient-primary"
                 onClick={async () => {
                   const ok = await requestNativePermissions();
-                  if (ok) toast.success("تم منح إذن الإشعارات");
-                  else toast.error("لم يتم منح الإذن — افتح إعدادات النظام");
+                  if (ok) toast.success(t("settings.native.granted"));
+                  else toast.error(t("settings.native.denied"));
                 }}
               >
-                <Bell className="me-1 h-4 w-4" /> منح الأذونات
+                <Bell className="me-1 h-4 w-4" /> {t("settings.native.grant")}
               </Button>
               <Button
                 variant="outline"
                 onClick={async () => {
                   await fireTestAlarm();
-                  toast.info("سيرنّ منبه الاختبار خلال 3 ثوانٍ");
+                  toast.info(t("settings.native.testing"));
                 }}
               >
-                <Zap className="me-1 h-4 w-4" /> اختبار المنبه
+                <Zap className="me-1 h-4 w-4" /> {t("settings.native.test")}
               </Button>
             </div>
           </Section>
