@@ -215,6 +215,13 @@ const EN: Dict = {
   "settings.resetDone": "Reset complete",
   "settings.footer": "LifeFlow AI · your data stays in your browser.",
   "settings.stopAlarm": "Stop alarm",
+  "settings.native.title": "Native alarm system (Android)",
+  "settings.native.desc": "LifeFlow uses Android's official AlarmManager for reliable alarms even when the app is closed or the phone reboots. Make sure to grant every permission and disable battery optimisation for this app.",
+  "settings.native.grant": "Grant permissions",
+  "settings.native.granted": "Notification permission granted",
+  "settings.native.denied": "Permission denied — open system settings",
+  "settings.native.test": "Test alarm",
+  "settings.native.testing": "Test alarm will ring in 3 seconds",
 
   // Prayer
   "prayer.title": "Prayer",
