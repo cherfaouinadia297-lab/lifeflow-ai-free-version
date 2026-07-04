@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WeatherRouteImport } from './routes/weather'
+import { Route as WakeRouteImport } from './routes/wake'
 import { Route as TimerRouteImport } from './routes/timer'
 import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as StatsRouteImport } from './routes/stats'
@@ -23,6 +24,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const WeatherRoute = WeatherRouteImport.update({
   id: '/weather',
   path: '/weather',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WakeRoute = WakeRouteImport.update({
+  id: '/wake',
+  path: '/wake',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TimerRoute = TimerRouteImport.update({
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/stats': typeof StatsRoute
   '/tasks': typeof TasksRoute
   '/timer': typeof TimerRoute
+  '/wake': typeof WakeRoute
   '/weather': typeof WeatherRoute
 }
 export interface FileRoutesByTo {
@@ -93,6 +100,7 @@ export interface FileRoutesByTo {
   '/stats': typeof StatsRoute
   '/tasks': typeof TasksRoute
   '/timer': typeof TimerRoute
+  '/wake': typeof WakeRoute
   '/weather': typeof WeatherRoute
 }
 export interface FileRoutesById {
@@ -106,6 +114,7 @@ export interface FileRoutesById {
   '/stats': typeof StatsRoute
   '/tasks': typeof TasksRoute
   '/timer': typeof TimerRoute
+  '/wake': typeof WakeRoute
   '/weather': typeof WeatherRoute
 }
 export interface FileRouteTypes {
@@ -120,6 +129,7 @@ export interface FileRouteTypes {
     | '/stats'
     | '/tasks'
     | '/timer'
+    | '/wake'
     | '/weather'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -132,6 +142,7 @@ export interface FileRouteTypes {
     | '/stats'
     | '/tasks'
     | '/timer'
+    | '/wake'
     | '/weather'
   id:
     | '__root__'
@@ -144,6 +155,7 @@ export interface FileRouteTypes {
     | '/stats'
     | '/tasks'
     | '/timer'
+    | '/wake'
     | '/weather'
   fileRoutesById: FileRoutesById
 }
@@ -157,6 +169,7 @@ export interface RootRouteChildren {
   StatsRoute: typeof StatsRoute
   TasksRoute: typeof TasksRoute
   TimerRoute: typeof TimerRoute
+  WakeRoute: typeof WakeRoute
   WeatherRoute: typeof WeatherRoute
 }
 
@@ -167,6 +180,13 @@ declare module '@tanstack/react-router' {
       path: '/weather'
       fullPath: '/weather'
       preLoaderRoute: typeof WeatherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wake': {
+      id: '/wake'
+      path: '/wake'
+      fullPath: '/wake'
+      preLoaderRoute: typeof WakeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/timer': {
@@ -245,6 +265,7 @@ const rootRouteChildren: RootRouteChildren = {
   StatsRoute: StatsRoute,
   TasksRoute: TasksRoute,
   TimerRoute: TimerRoute,
+  WakeRoute: WakeRoute,
   WeatherRoute: WeatherRoute,
 }
 export const routeTree = rootRouteImport

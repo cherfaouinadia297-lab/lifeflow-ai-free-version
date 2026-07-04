@@ -188,7 +188,7 @@ function AlarmDialog({ alarm, onClose }: { alarm: Alarm | null; onClose: () => v
       days: f.days.includes(day) ? f.days.filter((x) => x !== day) : [...f.days, day].sort() as WeekDay[],
     }));
   };
-  const toggleChallenge = (c: ChallengeKind) => {
+  const toggleChallenge = (c: Exclude<ChallengeKind, "none">) => {
     setForm((f) => {
       const set = new Set(f.challenges.filter((x) => x !== "none"));
       if (set.has(c)) set.delete(c); else set.add(c);
@@ -292,7 +292,7 @@ function AlarmDialog({ alarm, onClose }: { alarm: Alarm | null; onClose: () => v
             <div className="mb-2 flex items-center gap-2"><Brain className="h-4 w-4" /><span className="text-sm font-semibold">Wake challenges</span></div>
             <p className="mb-3 text-xs text-muted-foreground">Combine any of these — you'll have to complete all of them to dismiss the alarm.</p>
             <div className="flex flex-wrap gap-2">
-              {(["math-easy","math-medium","math-hard","shake","sentence","memory","focus"] as ChallengeKind[]).map((c) => {
+              {(["math-easy","math-medium","math-hard","shake","sentence","memory","focus"] as Exclude<ChallengeKind, "none">[]).map((c) => {
                 const active = form.challenges.includes(c);
                 return (
                   <button key={c} onClick={() => toggleChallenge(c)}
