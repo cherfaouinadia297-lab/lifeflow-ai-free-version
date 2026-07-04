@@ -1334,6 +1334,10 @@ const LEGACY_ALIASES: Record<string, string> = {
   loading: "common.loading",
   news: "nav.news",
 };
+LEGACY_ALIASES.wake = "nav.wake";
+for (const l of Object.keys(STRINGS)) {
+  if (!STRINGS[l]["nav.wake"]) STRINGS[l]["nav.wake"] = STRINGS[l]["nav.wake"] ?? "Wake Up";
+}
 
 function interpolate(s: string, vars?: Record<string, string | number>): string {
   if (!vars) return s;
