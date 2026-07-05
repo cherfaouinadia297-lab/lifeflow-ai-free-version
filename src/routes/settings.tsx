@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 import { ensureNotificationPermission } from "@/lib/notifications";
 import {
-  Moon, Sun, Bell, Languages, Trash2, Monitor, Music2, Volume2, Smartphone, Zap,
+  Moon, Sun, Bell, Languages, Trash2, Monitor, Music2, Volume2, Smartphone, Zap, Activity,
 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { LANGUAGES } from "@/lib/i18n";
 import { makeI18n } from "@/lib/i18n";
@@ -102,6 +103,9 @@ function SettingsPage() {
                 }}
               >
                 <Zap className="me-1 h-4 w-4" /> {t("settings.native.test")}
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/alarm-diagnostics"><Activity className="me-1 h-4 w-4" /> تشخيص المنبهات</Link>
               </Button>
             </div>
           </Section>
