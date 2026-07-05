@@ -19,6 +19,7 @@ import { Route as ScheduleRouteImport } from './routes/schedule'
 import { Route as PrayerRouteImport } from './routes/prayer'
 import { Route as NewsRouteImport } from './routes/news'
 import { Route as AssistantRouteImport } from './routes/assistant'
+import { Route as AlarmDiagnosticsRouteImport } from './routes/alarm-diagnostics'
 import { Route as IndexRouteImport } from './routes/index'
 
 const WeatherRoute = WeatherRouteImport.update({
@@ -71,6 +72,11 @@ const AssistantRoute = AssistantRouteImport.update({
   path: '/assistant',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AlarmDiagnosticsRoute = AlarmDiagnosticsRouteImport.update({
+  id: '/alarm-diagnostics',
+  path: '/alarm-diagnostics',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -79,6 +85,7 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/alarm-diagnostics': typeof AlarmDiagnosticsRoute
   '/assistant': typeof AssistantRoute
   '/news': typeof NewsRoute
   '/prayer': typeof PrayerRoute
@@ -92,6 +99,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/alarm-diagnostics': typeof AlarmDiagnosticsRoute
   '/assistant': typeof AssistantRoute
   '/news': typeof NewsRoute
   '/prayer': typeof PrayerRoute
@@ -106,6 +114,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/alarm-diagnostics': typeof AlarmDiagnosticsRoute
   '/assistant': typeof AssistantRoute
   '/news': typeof NewsRoute
   '/prayer': typeof PrayerRoute
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/alarm-diagnostics'
     | '/assistant'
     | '/news'
     | '/prayer'
@@ -134,6 +144,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/alarm-diagnostics'
     | '/assistant'
     | '/news'
     | '/prayer'
@@ -147,6 +158,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/alarm-diagnostics'
     | '/assistant'
     | '/news'
     | '/prayer'
@@ -161,6 +173,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AlarmDiagnosticsRoute: typeof AlarmDiagnosticsRoute
   AssistantRoute: typeof AssistantRoute
   NewsRoute: typeof NewsRoute
   PrayerRoute: typeof PrayerRoute
@@ -245,6 +258,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AssistantRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/alarm-diagnostics': {
+      id: '/alarm-diagnostics'
+      path: '/alarm-diagnostics'
+      fullPath: '/alarm-diagnostics'
+      preLoaderRoute: typeof AlarmDiagnosticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -257,6 +277,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AlarmDiagnosticsRoute: AlarmDiagnosticsRoute,
   AssistantRoute: AssistantRoute,
   NewsRoute: NewsRoute,
   PrayerRoute: PrayerRoute,
