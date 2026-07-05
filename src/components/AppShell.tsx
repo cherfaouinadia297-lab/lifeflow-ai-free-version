@@ -12,6 +12,7 @@ import {
   CloudSun,
   Newspaper,
   AlarmClock,
+  Activity,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useStore } from "@/lib/store";
@@ -25,6 +26,7 @@ const NAV = [
   { to: "/weather", key: "weather", icon: CloudSun },
   { to: "/news", key: "news", icon: Newspaper },
   { to: "/wake", key: "wake", icon: AlarmClock },
+  { to: "/alarm-diagnostics", key: "alarmDiagnostics", icon: Activity },
   { to: "/assistant", key: "assistant", icon: Bot },
   { to: "/timer", key: "timer", icon: TimerIcon },
   { to: "/stats", key: "stats", icon: BarChart3 },

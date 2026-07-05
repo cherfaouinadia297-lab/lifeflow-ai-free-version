@@ -20,8 +20,9 @@ import { registerNotificationSW } from "../lib/sw-register";
 import {
   isNative,
   requestNativePermissions,
-  syncTaskAlarms,
 } from "../lib/native-alarms";
+import { syncAllNativeAlarms } from "../lib/alarm-sync";
+import { useWake } from "../lib/wake-store";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog";
 import { Button } from "../components/ui/button";
 import { BellRing } from "lucide-react";
@@ -158,6 +159,7 @@ function RootComponent() {
 
 function NotificationScheduler() {
   const { state, updateTask, setRinging, finishTimer } = useStore();
+  const wake = useWake();
 
   // Register the service worker once
   useEffect(() => {
@@ -166,12 +168,11 @@ function NotificationScheduler() {
     if (isNative()) void requestNativePermissions();
   }, []);
 
-  // Native: sync all scheduled alarms with the OS whenever tasks change.
-  // The OS then fires them exactly on time even if the app is closed.
+  // Native: sync task + wake-up + prayer alarms with Android AlarmManager.
   useEffect(() => {
     if (!isNative()) return;
-    void syncTaskAlarms(state.tasks);
-  }, [state.tasks]);
+    void syncAllNativeAlarms(state, wake.state);
+  }, [state, wake.state]);
 
   // Precise per-task alarm scheduling (re-runs whenever tasks change)
   useEffect(() => {
