@@ -78,6 +78,8 @@ export interface PrayerState {
   enabled: Record<string, boolean>; // per-prayer notification toggle
   reminderMinutes: number; // 0,5,10,15,30
   cache: PrayerTimings | null;
+  adhanId?: string; // selected adhan sound id (see adhan-library.ts)
+  customAdhans?: Array<{ id: string; name: string; url: string }>;
 }
 
 export interface WeatherCoords { lat: number; lng: number; city?: string }
