@@ -187,7 +187,7 @@ function AlarmDialog({ alarm, onClose }: { alarm: Alarm | null; onClose: () => v
     volume: alarm?.volume ?? d.volume,
     challenges: alarm?.challenges ?? ["none"],
     shakeCount: alarm?.shakeCount ?? 20,
-    sentence: alarm?.sentence ?? tr(useStore().state.language, "wake.defaultSentence"),
+    sentence: alarm?.sentence ?? t("wake.defaultSentence"),
     confirmAfterMinutes: alarm?.confirmAfterMinutes ?? d.confirmAfterMinutes,
   });
   const [showRingtones, setShowRingtones] = useState(false);
