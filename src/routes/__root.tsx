@@ -27,6 +27,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/
 import { Button } from "../components/ui/button";
 import { BellRing } from "lucide-react";
 import { t } from "../lib/i18n";
+import { PrayerAdhanController } from "../components/PrayerAdhanController";
 
 function NotFoundComponent() {
   return (
@@ -149,6 +150,7 @@ function RootComponent() {
       <StoreProvider>
         <NotificationScheduler />
         <AlarmDialog />
+        <PrayerAdhanController />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         <Toaster position="top-center" richColors />
