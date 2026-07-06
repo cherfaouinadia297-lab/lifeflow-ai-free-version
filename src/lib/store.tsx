@@ -33,6 +33,8 @@ const initialPrayer: PrayerState = {
   enabled: { Fajr: true, Dhuhr: true, Asr: true, Maghrib: true, Isha: true },
   reminderMinutes: 0,
   cache: null,
+  adhanId: "makkah",
+  customAdhans: [],
 };
 
 const initialWeather: WeatherState = { coords: null, cache: null };
@@ -139,6 +141,9 @@ interface StoreContext {
   setPrayerEnabled: (key: string, enabled: boolean) => void;
   setPrayerReminder: (mins: number) => void;
   setPrayerCache: (c: PrayerTimings | null) => void;
+  setPrayerAdhan: (id: string) => void;
+  addCustomAdhan: (a: { id: string; name: string; url: string }) => void;
+  removeCustomAdhan: (id: string) => void;
   // Weather
   setWeatherCoords: (c: WeatherCoords | null) => void;
   setWeatherCache: (c: WeatherCache | null) => void;
@@ -314,6 +319,24 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setPrayerReminder: (mins) =>
         setState((s) => ({ ...s, prayer: { ...s.prayer, reminderMinutes: mins } })),
       setPrayerCache: (c) => setState((s) => ({ ...s, prayer: { ...s.prayer, cache: c } })),
+      setPrayerAdhan: (id) =>
+        setState((s) => ({ ...s, prayer: { ...s.prayer, adhanId: id } })),
+      addCustomAdhan: (a) =>
+        setState((s) => ({
+          ...s,
+          prayer: {
+            ...s.prayer,
+            customAdhans: [...(s.prayer.customAdhans ?? []).filter((c) => c.id !== a.id), a],
+          },
+        })),
+      removeCustomAdhan: (id) =>
+        setState((s) => ({
+          ...s,
+          prayer: {
+            ...s.prayer,
+            customAdhans: (s.prayer.customAdhans ?? []).filter((c) => c.id !== id),
+          },
+        })),
       // Weather -------------------------------------------------------
       setWeatherCoords: (c) => setState((s) => ({ ...s, weather: { ...s.weather, coords: c } })),
       setWeatherCache: (c) => setState((s) => ({ ...s, weather: { ...s.weather, cache: c } })),
